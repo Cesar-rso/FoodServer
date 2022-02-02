@@ -1,0 +1,48 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Checkout{% endblock %}
+{% block body %}
+    <nav class="navbar navbar-default" style="background-color:Tomato">
+        <h1>Checkout</h1>
+        <div class="container-fluid">
+            <form class="navbar-form navbar-right" role="search" method="post" name="search">
+                 {% csrf_token %}
+                <h2>Table: </h2>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="search" value="">
+                </div>
+                <button type="submit" class="btn btn-default">Search</button>
+            </form>
+        </div>
+    </nav>
+    <ul>
+    {% for order in orders %}
+        {% if order.status != 'PA' %}
+        <li><h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3></li>
+        {% for product in order.product.all %}
+            <p> <b>-Item:</b> {{ product.name }}</p>
+        {% endfor %}
+        {% endif %}
+        <hr>
+    {% endfor %}
+    </ul>
+<nav class="navbar navbar-default" style="background-color:Tomato">
+    {% if user.is_authenticated %}
+    <div>
+        {% with total=orders_total %}
+        <h1>Total: ${{ total|default:"00.00" }}</h1>
+        {% endwith %}
+    </div>
+    <div class="container-fluid">
+        <form method="post" name="pay" action="pay_orders">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-default" value="{{ table }}" name="pay">Confirm pay</button>
+        </form>
+    </div>
+    {% else %}
+    <div>
+        <h1>Log in to checkout orders</h1>
+    </div>
+    {% endif %}
+</nav>
+{% endblock %}

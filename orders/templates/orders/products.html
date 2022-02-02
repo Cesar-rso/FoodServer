@@ -1,0 +1,42 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Products{% endblock %}
+{% block body %}
+    <nav class="navbar navbar-default" style="background-color:Tomato">
+        <div class="container-fluid">
+            <h1>Products</h1>
+            <div class="navbar navbar-left">
+                <a href="{% url 'reg_product' %}"><h2 style="color:black"><pre> Add Product </pre></h2></a>
+            </div>
+            <form class="navbar-form navbar-right" role="search" method="post" name="search">
+                 {% csrf_token %}
+                <div class="form-group">
+                    <label for="prod_search"><h2>Search: </h2></label>
+                    <input type="text" id="prod_search" class="form-control" name="search" value="">
+                </div>
+                <button type="submit" class="btn btn-default">OK</button>
+            </form>
+        </div>
+    </nav>
+<ul style="list-style-type:none;">
+{% for product in products %}
+    <li>
+        <ul style="list-style-type:none;">
+            <li style="height:400px;">
+                <img src="media/{{ product.picture }}" alt="Product Image" style="width:400px;height:300px;float:left;">
+
+            <h2> - {{ product.name }}</h2>
+            <h2>  $ {{ product.price|floatformat:2 }}</h2><br>
+            - {{ product.description }}
+            </li>
+            <li>
+                <form method="post">
+                        {% csrf_token %}
+                    <button name="submit" type="submit" value="{{ product.id }}">Delete Product</button>
+                </form>
+            </li>
+        </ul>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

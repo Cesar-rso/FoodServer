@@ -1,0 +1,2 @@
+ #FoodServer
+ [English] A basic back-end system for restaurants, where orders can be made through an phone app, that communicates with the system through REST API in local network.Phone app not provided here. [Português] Um sistema de back-end básico para restaurantes, onde pedidos podem ser feitos por um app de celular, que se comunica com o sistema por API REST na rede local. Aplicativo de celular não é fornecido aqui.
