@@ -11,7 +11,7 @@ from .models import Order, Products, Payments
 
 
 class PlaceOrder(APIView):
-
+    # REST API view where waiters place orders. The waiter must be an authenticated user
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -31,7 +31,7 @@ class PlaceOrder(APIView):
 
 
 class CheckOrder(APIView):
-
+    # REST API view where waiters can check specific orders (status, products, etc)
     def get(self, request):
         data = JSONParser().parse(request)
         order = Order.objects.filter(table=data['table']).order_by('date')[0]
@@ -41,6 +41,7 @@ class CheckOrder(APIView):
 
 
 class CancelOrder(APIView):
+    # REST API view for waiters to cancel orders. The waiter must be an authenticated user
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -54,7 +55,7 @@ class CancelOrder(APIView):
 
 
 class CheckProduct(APIView):
-
+    # REST API view where waiters can search for specific products
     def get(self, request):
         data = JSONParser().parse(request)
         products = Products.objects.get(pk=data['id'])
@@ -65,6 +66,7 @@ class CheckProduct(APIView):
 
 
 class ControlOrders(generic.ListView):
+    # View that gives employees in the kitchen full control of the orders made by waiters
     template_name = 'orders/index.html'
     context_object_name = 'all_orders'
 
@@ -86,6 +88,7 @@ class ControlOrders(generic.ListView):
 
 
 class Checkout(generic.ListView):
+    # View that allows payment of orders from specific table
     template_name = 'orders/checkout.html'
     context_object_name = 'orders'
 
@@ -107,6 +110,8 @@ class Checkout(generic.ListView):
 
 
 class ListProducts (generic.ListView):
+    # View that lists all products, allowing deletion and inclusion of new ones.
+    # Unlike the REST API CheckProduct view, this one is meant for employees in the kitchen
     template_name = "orders/products.html"
     context_object_name = "products"
 
@@ -132,12 +137,14 @@ class ListProducts (generic.ListView):
 
 
 class ProductRegistration(CreateView):
+    # Basic form view for adding new products to the system
     model = Products
     fields = '__all__'
     template_name = "orders/product-form.html"
 
 
 def pay_orders(request):
+    # Method for saving payments and updating orders payment status
     if request.method == "POST":
         table = request.POST['pay']
         orders = Order.objects.filter(table=table)
@@ -155,6 +162,7 @@ def pay_orders(request):
 
 
 def login_request(request):
+    # Basic login method
     context = {}
     if request.method == 'POST':
         username = request.POST['username']
@@ -171,5 +179,6 @@ def login_request(request):
 
 
 def logout_request(request):
+    # Basic logout method
     logout(request)
     return redirect('orders')
