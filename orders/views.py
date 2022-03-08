@@ -74,15 +74,14 @@ class ControlOrders(generic.ListView):
         return Order.objects.all().order_by('date')
 
     def post(self, request):
-        order = Order.objects.get(pk=request.POST['submit'])
-        order.status = request.POST['status']
-        order.save()
+        if 'submit' in request.POST.keys():
+            order = Order.objects.get(pk=request.POST['submit'])
+            order.status = request.POST['status']
+            order.save()
 
-        return redirect('orders')
-
-    def delete(self, request):
-        order = Order.objects.get(pk=request.POST['submit'])
-        order.delete()
+        if 'delete' in request.POST.keys():
+            order = Order.objects.get(pk=request.POST['delete'])
+            order.delete()
 
         return redirect('orders')
 
