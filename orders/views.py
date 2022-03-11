@@ -95,7 +95,7 @@ class Checkout(generic.ListView):
         return Order.objects.all().order_by('date')
 
     def post(self, request):
-        if 'search' in request.POST.keys() and request.POST['search'] != '':
+        if 'search' in request.POST.keys() and request.POST['search'].isdecimal():
             table = request.POST['search']
             orders = Order.objects.filter(table=table)
             total = 0.0
@@ -147,12 +147,12 @@ def pay_orders(request):
     if request.method == "POST":
         table = request.POST['pay']
         orders = Order.objects.filter(table=table)
-        payment = Payments.objects.create_payments(user=request.user)
+        payment = Payments.objects.create(user=request.user)
         total = 0.0
         for order in orders:
             for product in order.product.all():
                 total += product.price
-            order.payment = payment.pk
+            order.payment = payment
             order.status = "PA"
             order.save()
         payment.value = total
@@ -166,6 +166,7 @@ def login_request(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+
         user = authenticate(username=username, password=password)
 
         if user is not None:

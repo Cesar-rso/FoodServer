@@ -3,7 +3,7 @@
 {% block body %}
   <br>
   <h1>{{ message }}</h1>
-  <form action="{% url 'orders:orders' %}" method="get">
+  <form action="{% url 'orders' %}" method="get">
       {% csrf_token %}
       <button name="Back" type="submit">Back</button>
   </form>
