@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth.models import User
 from .models import Order, Products, Payments
-from .views import ControlOrders, login_request, Checkout
+from .views import ControlOrders, login_request, Checkout, ListProducts
 
 
 class OrdersTestCase(TestCase):
@@ -70,7 +70,7 @@ class CheckoutTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_CheckoutPOST_SQL_injection(self):
-        response = self.client.post(reverse('checkout'), {'search': '\'); DELETE * FROM Orders;'})
+        response = self.client.post(reverse('checkout'), {'search': '\'); DELETE * FROM Order;'})
         self.assertEqual(response.status_code, 302)
         orders = Order.objects.all()
         self.assertNotEqual(orders.count(), 0)
@@ -81,6 +81,33 @@ class CheckoutTestCase(TestCase):
         status = Order.objects.all().first().status
         self.assertEqual(response.status_code, 302)
         self.assertEqual(status, 'PA')
+
+
+class ProductsTestCase(TestCase):
+    def setUp(self):
+        test_product = Products.objects.create(name='testProduct', description='-test-', price='2.56')
+        test_product.save()
+
+    def test_url(self):
+        url = reverse('products')
+        self.assertEqual(resolve(url).func.view_class, ListProducts)
+
+    def test_ProductsPOST_search(self):
+        response = self.client.post(reverse('products'), {'search': 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'orders/products.html')
+
+    def test_ProductsPOST_search_SQL_Injection(self):
+        response = self.client.post(reverse('products'), {'search': '1\'); DELETE * FROM Products;'})
+        products = Products.objects.all().count()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(products, 0)
+
+    def test_ProductsPOST_delete(self):
+        response = self.client.post(reverse('products'), {'submit': 1})
+        products = Products.objects.all().count()
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(products, 0)
 
 
 class LoginTestCase(TestCase):
