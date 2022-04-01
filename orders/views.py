@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import generic
 from django.views.generic import CreateView, UpdateView
 from django.contrib.auth import authenticate, login, logout
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
@@ -58,11 +59,15 @@ class CheckProduct(APIView):
     # REST API view where waiters can search for specific products
     def get(self, request):
         data = JSONParser().parse(request)
-        products = Products.objects.get(pk=data['id'])
 
-        serializer = ProductSerializer(products)
+        try:
+            products = Products.objects.get(pk=data['id'])
+            serializer = ProductSerializer(products)
+            resp = serializer.data
+        except ObjectDoesNotExist:
+            resp = {"exception": "Couldn't find requested product!"}
 
-        return Response(serializer.data)
+        return Response(resp)
 
 
 class ControlOrders(generic.ListView):

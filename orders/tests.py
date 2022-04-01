@@ -1,8 +1,26 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth.models import User
+from rest_framework.test import APITestCase
 from .models import Order, Products, Payments
-from .views import ControlOrders, login_request, Checkout, ListProducts
+from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct
+
+
+class ProductRestTest(APITestCase):
+    def setUp(self):
+        Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
+
+    def test_url(self):  # Verifying if the correct url resolves
+        url = reverse('check-product')
+        self.assertEqual(resolve(url).func.view_class, CheckProduct)
+
+    def test_correctID(self):
+        product = Products.objects.all().first()
+        response = self.client.get(reverse('check-product'), {"id": product.pk}, format='json')
+        product_data = {"id": 1, "name": "testProduct", "description": "-test-", "price": 2.56,
+                                         "picture": "/media/products/default.jpg"}
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, product_data)
 
 
 class OrdersTestCase(TestCase):
@@ -11,7 +29,7 @@ class OrdersTestCase(TestCase):
         user.set_password('passtest')
         user.save()
         Payments.objects.create(value=0.0, user=user)
-        test_product = Products.objects.create(name='testProduct', description='-test-', price='2.56')
+        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56)
         test_product.save()
         test_order = Order.objects.create(table=1, status='WA')
         test_order.save()
@@ -46,7 +64,7 @@ class CheckoutTestCase(TestCase):
         user.set_password('passtest')
         user.save()
         Payments.objects.create(value=0.0, user=user)
-        test_product = Products.objects.create(name='testProduct', description='-test-', price='2.56')
+        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56)
         test_product.save()
         test_order = Order.objects.create(table=1, status='WA')
         test_order.save()
@@ -85,7 +103,7 @@ class CheckoutTestCase(TestCase):
 
 class ProductsTestCase(TestCase):
     def setUp(self):
-        test_product = Products.objects.create(name='testProduct', description='-test-', price='2.56')
+        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56)
         test_product.save()
 
     def test_url(self):
