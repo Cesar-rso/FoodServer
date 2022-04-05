@@ -16,9 +16,23 @@ class ProductRestTest(APITestCase):
 
     def test_correctID(self):
         product = Products.objects.all().first()
-        response = self.client.get(reverse('check-product'), {"id": product.pk}, format='json')
+        search = {"id": product.pk}
+        url = reverse('check-product')
+
+        response = self.client.get(url, search)
         product_data = {"id": 1, "name": "testProduct", "description": "-test-", "price": 2.56,
-                                         "picture": "/media/products/default.jpg"}
+                                         "picture": "/media/default.jpg"}
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, product_data)
+
+    def test_wrongID(self):
+        search = {"id": 2}
+        url = reverse('check-product')
+
+        response = self.client.get(url, search)
+        product_data = {"exception": "Couldn't find requested product!"}
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, product_data)
 

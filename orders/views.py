@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser, ParseError
 from rest_framework.permissions import IsAuthenticated
 from .serializers import OrderSerializer, ProductSerializer
 from .models import Order, Products, Payments
@@ -33,8 +33,10 @@ class PlaceOrder(APIView):
 
 class CheckOrder(APIView):
     # REST API view where waiters can check specific orders (status, products, etc)
+    parser_classes = (JSONParser,)
+
     def get(self, request):
-        data = JSONParser().parse(request)
+        data = request.GET
         order = Order.objects.filter(table=data['table']).order_by('date')[0]
         serializer = OrderSerializer(order)
 
@@ -44,9 +46,10 @@ class CheckOrder(APIView):
 class CancelOrder(APIView):
     # REST API view for waiters to cancel orders. The waiter must be an authenticated user
     permission_classes = (IsAuthenticated,)
+    parser_classes = (JSONParser,)
 
     def post(self, request):
-        data = JSONParser().parse(request)
+        data = request.data
         order = Order.objects.filter(table=data['table']).order_by('date')[0]
         order.status = Order.Status.CANCELED
         order.save()
@@ -57,11 +60,13 @@ class CancelOrder(APIView):
 
 class CheckProduct(APIView):
     # REST API view where waiters can search for specific products
-    def get(self, request):
-        data = JSONParser().parse(request)
+    parser_classes = (JSONParser,)
 
+    def get(self, request):
+
+        data = request.GET
         try:
-            products = Products.objects.get(pk=data['id'])
+            products = Products.objects.get(pk=int(data['id']))
             serializer = ProductSerializer(products)
             resp = serializer.data
         except ObjectDoesNotExist:
