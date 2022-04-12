@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views import generic
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser, ParseError
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from .serializers import OrderSerializer, ProductSerializer
 from .models import Order, Products, Payments
@@ -49,11 +49,15 @@ class CancelOrder(APIView):
     parser_classes = (JSONParser,)
 
     def post(self, request):
-        data = request.data
-        order = Order.objects.filter(table=data['table']).order_by('date')[0]
-        order.status = Order.Status.CANCELED
-        order.save()
-        resp = {"status": "Order canceled!"}
+        data = request.POST
+
+        try:
+            order = Order.objects.filter(table=data['table']).order_by('date')[0]
+            order.status = Order.Status.CANCELED
+            order.save()
+            resp = {"status": "Order canceled!"}
+        except ObjectDoesNotExist:
+            resp = {"exception": "Couldn't find requested product!"}
 
         return Response(resp)
 

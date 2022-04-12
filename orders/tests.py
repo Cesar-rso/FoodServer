@@ -1,12 +1,14 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth.models import User
-from rest_framework.test import APITestCase
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase, force_authenticate
+from rest_framework import status
 from .models import Order, Products, Payments
-from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct
+from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder
 
 
-class ProductRestTest(APITestCase):
+class CheckProductAPITest(APITestCase):
     def setUp(self):
         Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
 
@@ -37,6 +39,45 @@ class ProductRestTest(APITestCase):
         self.assertEqual(response.data, product_data)
 
 
+class CancelOrderAPITest(APITestCase):
+
+    def setUp(self):
+        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
+        test_product.save()
+        test_order = Order.objects.create(table=1, status='WA')
+        test_order.save()
+        test_order.product.add(test_product)
+
+        self.user = User.objects.create(username='test')
+        self.user.set_password('passtest')
+        self.user.save()
+
+        Payments.objects.create(value=0.0, user=self.user)
+        Token.objects.create(user=self.user)
+
+    def test_url(self):
+        url = reverse('cancel-order')
+        self.assertEqual(resolve(url).func.view_class, CancelOrder)
+
+    def test_CancelWithNoCredentials(self):
+        data = {"table": 1}
+
+        response = self.client.post(reverse('cancel-order'), data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_CancelWithCredentials(self):
+        self.client.login(username='test', password='passtest')
+
+        token = Token.objects.get(user=self.user)
+        print(token.key)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+
+        data = {"table": 1}
+
+        response = self.client.post(reverse('cancel-order'), data, content_type='application/json', secure=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)  # returning 400. Investigate further
+
+
 class OrdersTestCase(TestCase):
     def setUp(self):
         user = User.objects.create(username='test')
@@ -55,20 +96,20 @@ class OrdersTestCase(TestCase):
 
     def test_OrdersGET(self):
         response = self.client.get(reverse('orders'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(response, 'orders/index.html')
 
     def test_OrdersPOST(self):
         response = self.client.post(reverse('orders'), {'submit': 1, 'status': 'PP'})
         current_status = Order.objects.get(pk=1).status
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(current_status, 'PP')
 
     def test_OrdersDELETE(self):
         order_to_delete = Order.objects.all().first().pk
         response = self.client.post(reverse('orders'), {'delete': order_to_delete, 'status': 'PP'})
         orders = Order.objects.all()
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(orders.count(), 0)
 
 
@@ -90,29 +131,29 @@ class CheckoutTestCase(TestCase):
 
     def test_CheckoutGET(self):
         response = self.client.get(reverse('checkout'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(response, 'orders/checkout.html')
 
     def test_CheckoutPOST(self):
         response = self.client.post(reverse('checkout'), {'search': 1})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_CheckoutPOST_empty(self):
         response = self.client.post(reverse('checkout'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
 
     def test_CheckoutPOST_SQL_injection(self):
         response = self.client.post(reverse('checkout'), {'search': '\'); DELETE * FROM Order;'})
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         orders = Order.objects.all()
         self.assertNotEqual(orders.count(), 0)
 
     def test_payOrders(self):
         self.client.login(username='test', password='passtest')
         response = self.client.post(reverse('pay_orders'), {'pay': 1})
-        status = Order.objects.all().first().status
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(status, 'PA')
+        self.status = Order.objects.all().first().status
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(self.status, 'PA')
 
 
 class ProductsTestCase(TestCase):
@@ -126,19 +167,19 @@ class ProductsTestCase(TestCase):
 
     def test_ProductsPOST_search(self):
         response = self.client.post(reverse('products'), {'search': 1})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(response, 'orders/products.html')
 
     def test_ProductsPOST_search_SQL_Injection(self):
         response = self.client.post(reverse('products'), {'search': '1\'); DELETE * FROM Products;'})
         products = Products.objects.all().count()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(products, 0)
 
     def test_ProductsPOST_delete(self):
         response = self.client.post(reverse('products'), {'submit': 1})
         products = Products.objects.all().count()
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(products, 0)
 
 
@@ -159,7 +200,7 @@ class LoginTestCase(TestCase):
 
     def test_correctLogin_page(self):
         response = self.client.post(reverse('login'), {'username': 'test', 'password': 'passtest'})
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
 
     def test_wrongLogin_API(self):
         response = self.client.login(username='None', password='none')
@@ -168,8 +209,8 @@ class LoginTestCase(TestCase):
     def test_wrongLogin_page(self):
         response = self.client.post(reverse('login'), {'username': 'Wrong', 'password': 'wrong'})
         self.assertTemplateUsed(response, 'orders/error.html')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_logout(self):
         response = self.client.get(reverse('logout'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
