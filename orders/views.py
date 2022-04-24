@@ -49,7 +49,7 @@ class CancelOrder(APIView):
     parser_classes = (JSONParser,)
 
     def post(self, request):
-        data = request.POST
+        data = request.data
 
         try:
             order = Order.objects.filter(table=data['table']).order_by('date')[0]

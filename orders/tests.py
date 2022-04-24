@@ -1,8 +1,10 @@
+import json
+
 from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase, force_authenticate
+from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Order, Products, Payments
 from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder
@@ -61,21 +63,26 @@ class CancelOrderAPITest(APITestCase):
 
     def test_CancelWithNoCredentials(self):
         data = {"table": 1}
+        data = json.dumps(data)
 
-        response = self.client.post(reverse('cancel-order'), data)
+        response = self.client.post(reverse('cancel-order'), data=data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_CancelWithCredentials(self):
-        self.client.login(username='test', password='passtest')
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
 
-        token = Token.objects.get(user=self.user)
-        print(token.key)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         data = {"table": 1}
+        data = json.dumps(data)
 
-        response = self.client.post(reverse('cancel-order'), data, content_type='application/json', secure=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # returning 400. Investigate further
+        response = self.client.post(reverse('cancel-order'), data=data, content_type="application/json")
+        order = Order.objects.filter(table=1).order_by('date')[0]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(order.status, Order.Status.CANCELED)
 
 
 class OrdersTestCase(TestCase):
