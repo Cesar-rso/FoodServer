@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Order, Products, Payments
-from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder
+from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder, CheckOrder
 
 
 class CheckProductAPITest(APITestCase):
@@ -65,7 +65,7 @@ class CancelOrderAPITest(APITestCase):
         data = {"table": 1}
         data = json.dumps(data)
 
-        response = self.client.post(reverse('cancel-order'), data=data, content_type="application/json")
+        response = self.client.post(reverse('cancel-order'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_CancelWithCredentials(self):
@@ -76,13 +76,53 @@ class CancelOrderAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         data = {"table": 1}
-        data = json.dumps(data)
 
-        response = self.client.post(reverse('cancel-order'), data=data, content_type="application/json")
+        response = self.client.post(reverse('cancel-order'), data=data, format="json")
         order = Order.objects.filter(table=1).order_by('date')[0]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(order.status, Order.Status.CANCELED)
+
+    def test_CancelWithWrongData(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"table": 5}
+
+        response = self.client.post(reverse('cancel-order'), data=data, format="json")
+        order = Order.objects.filter(table=1).order_by('date')[0]
+        rt_data = {"exception": "Couldn't find requested product!"}
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(order.status, Order.Status.WAITING)
+        self.assertEqual(response.data, rt_data)
+
+
+class CheckOrderAPITest(APITestCase):
+
+    def setUp(self):
+        user = User.objects.create(username='test')
+        user.set_password('passtest')
+        user.save()
+        Payments.objects.create(value=0.0, user=user)
+        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
+        test_product.save()
+        test_order = Order.objects.create(table=1, status='WA')
+        test_order.save()
+        test_order.product.add(test_product)
+
+    def test_url(self):  # Verifying if the correct url resolves
+        url = reverse('check-order')
+        self.assertEqual(resolve(url).func.view_class, CheckOrder)
+
+    def testCheckOrderWithExistingTable(self):
+        data = {"table": 1}
+        response = self.client.get(reverse("check-order"), data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print(response.data)
 
 
 class OrdersTestCase(TestCase):

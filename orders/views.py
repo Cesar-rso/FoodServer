@@ -58,6 +58,8 @@ class CancelOrder(APIView):
             resp = {"status": "Order canceled!"}
         except ObjectDoesNotExist:
             resp = {"exception": "Couldn't find requested product!"}
+        except IndexError:
+            resp = {"exception": "Couldn't find requested product!"}
 
         return Response(resp)
 
