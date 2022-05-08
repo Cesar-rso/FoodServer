@@ -14,19 +14,24 @@ from .models import Order, Products, Payments
 class PlaceOrder(APIView):
     # REST API view where waiters place orders. The waiter must be an authenticated user
     permission_classes = (IsAuthenticated,)
+    parser_classes = (JSONParser,)
 
     def post(self, request):
-        data = JSONParser().parse(request)
+        data = request.data
 
         order = Order(table=data['table'], status=data['status'])
         order.save()
         products = data['products']
-        counter = 1
+        counter = 0
+        stats = "Order placed!"
         for product in products:
-            p1 = Products.objects.get(pk=products[product])
-            order.product.add(p1)
-            counter += 1
-        resp = {"status": "Order placed!"}
+            try:
+                p1 = Products.objects.get(pk=products[product])
+                order.product.add(p1)
+                counter += 1
+            except Exception as e:
+                stats = "Error! Could not find product!"
+        resp = {"status": stats}
 
         return Response(resp)
 
@@ -37,10 +42,15 @@ class CheckOrder(APIView):
 
     def get(self, request):
         data = request.GET
-        order = Order.objects.filter(table=data['table']).order_by('date')[0]
+        order = Order.objects.filter(table=data['table']).order_by('date').first()
         serializer = OrderSerializer(order)
 
-        return Response(serializer.data)
+        if order is None:
+            response = {"exception": "Couldn't find requested order!"}
+        else:
+            response = serializer.data
+
+        return Response(response)
 
 
 class CancelOrder(APIView):
@@ -52,13 +62,14 @@ class CancelOrder(APIView):
         data = request.data
 
         try:
-            order = Order.objects.filter(table=data['table']).order_by('date')[0]
-            order.status = Order.Status.CANCELED
-            order.save()
-            resp = {"status": "Order canceled!"}
+            order = Order.objects.filter(table=data['table']).order_by('date').first()
+            if order is None:
+                resp = {"exception": "Couldn't find requested product!"}
+            else:
+                order.status = Order.Status.CANCELED
+                order.save()
+                resp = {"status": "Order canceled!"}
         except ObjectDoesNotExist:
-            resp = {"exception": "Couldn't find requested product!"}
-        except IndexError:
             resp = {"exception": "Couldn't find requested product!"}
 
         return Response(resp)

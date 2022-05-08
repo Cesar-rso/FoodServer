@@ -1,5 +1,3 @@
-import json
-
 from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth.models import User
@@ -7,7 +5,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Order, Products, Payments
-from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder, CheckOrder
+from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder, CheckOrder, \
+    PlaceOrder
 
 
 class CheckProductAPITest(APITestCase):
@@ -63,7 +62,6 @@ class CancelOrderAPITest(APITestCase):
 
     def test_CancelWithNoCredentials(self):
         data = {"table": 1}
-        data = json.dumps(data)
 
         response = self.client.post(reverse('cancel-order'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -122,7 +120,79 @@ class CheckOrderAPITest(APITestCase):
         data = {"table": 1}
         response = self.client.get(reverse("check-order"), data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print(response.data)
+        # print(response.data)
+
+    def testCheckOrderWithWrongTableNumber(self):
+        data = {"table": 5}
+        resp = {"exception": "Couldn't find requested order!"}
+        response = self.client.get(reverse("check-order"), data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, resp)
+
+
+class PlaceOrdersAPITest(APITestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username='test')
+        self.user.set_password('passtest')
+        self.user.save()
+        Payments.objects.create(value=0.0, user=self.user)
+        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
+        test_product.save()
+        test_product2 = Products.objects.create(id=2, name='testProduct2', description='-test2-', price=3.88)
+        test_product2.save()
+
+    def test_url(self):  # Verifying if the correct url resolves
+        url = reverse('place-order')
+        self.assertEqual(resolve(url).func.view_class, PlaceOrder)
+
+    def testPlaceOrderWithCorrectDataNoToken(self):
+        data = {"products": {"product1": 1, "product2": 2}, "table": 1, "status": "WA"}
+        response = self.client.post(reverse("place-order"), data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def testPlaceOrderWithCorrectDataWithToken(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"products": {"product1": 1, "product2": 2}, "table": 1, "status": "WA"}
+        response = self.client.post(reverse("place-order"), data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"], "Order placed!")
+
+        order = Order.objects.all().first()
+        self.assertEqual(order.status, "WA")
+        self.assertEqual(order.table, 1)
+        pk_counter = 1
+        for product in order.product.all():
+            self.assertEqual(product.pk, pk_counter)
+            pk_counter += 1
+            if product.pk == 1:
+                self.assertEqual(product.name, "testProduct")
+                self.assertEqual(product.description, "-test-")
+                self.assertEqual(product.price, 2.56)
+            if product.pk == 2:
+                self.assertEqual(product.name, "testProduct2")
+                self.assertEqual(product.description, "-test2-")
+                self.assertEqual(product.price, 3.88)
+
+    def testPlaceOrderWithWrongDataWithToken(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"products": {"product1": 3}, "table": 1, "status": "WA"}
+        response = self.client.post(reverse("place-order"), data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"], "Error! Could not find product!")
 
 
 class OrdersTestCase(TestCase):
