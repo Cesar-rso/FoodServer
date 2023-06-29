@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views import generic
 from django.views.generic import CreateView
 from django.contrib.auth import authenticate, login, logout
@@ -9,6 +10,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from .serializers import OrderSerializer, ProductSerializer
 from .models import Order, Products, Payments
+import requests
 
 
 class PlaceOrder(APIView):
@@ -22,13 +24,13 @@ class PlaceOrder(APIView):
         order = Order(table=data['table'], status=data['status'])
         order.save()
         products = data['products']
-        counter = 0
+        #counter = 0
         stats = "Order placed!"
         for product in products:
             try:
                 p1 = Products.objects.get(pk=products[product])
                 order.product.add(p1)
-                counter += 1
+                #counter += 1
             except Exception as e:
                 stats = "Error! Could not find product!"
         resp = {"status": stats}
@@ -167,6 +169,21 @@ class ProductRegistration(CreateView):
     model = Products
     fields = '__all__'
     template_name = "orders/product-form.html"
+
+
+def new_order(request):
+    # Method for saving payments and updating orders payment status
+    if request.method == "POST":
+        table = request.POST['table_number']
+
+        context = {'table': table, 'status':'WA', 'products': []}
+        response = requests.post(request.build_absolute_uri(reverse('new-order')), json=context)
+        data = response.json
+
+        if data["status"] == "Pedido adicionado com sucesso!":
+            return redirect('new_order')
+        else:
+            return render(request, "error.html", {"message": "Erro ao realizar pedido!"})
 
 
 def pay_orders(request):

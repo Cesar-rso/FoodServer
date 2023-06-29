@@ -1,0 +1,29 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}New Order{% endblock %}
+{% block body %}
+<nav class="navbar navbar-default" style="background-color:Tomato">
+    <div class="container-fluid">
+        <h1>New Order</h1>
+    </div>
+</nav>
+</div>
+<form class="navbar-form navbar-right" method="post" name="neworder">
+    <fieldset>
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="table_number"><h2>Table: </h2></label>
+            <input type="number" id="table_number" class="form-control" name="table_number" value="">
+        </div>
+        <div class="form-group">
+            <label for="order_items"><h2>Items: </h2></label>
+            <select id="order_items" class="form-control" name="order_items" multiple>
+                {% for product in products %}
+                <option value={{ product.id }}>{{ product.name }}</option>
+                {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-default">OK</button>
+    </fieldset>
+</form>
+</div>
+{% endblock %}
