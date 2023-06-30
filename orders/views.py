@@ -172,7 +172,12 @@ class ProductRegistration(CreateView):
 
 
 def new_order(request):
-    # Method for saving payments and updating orders payment status
+    # Method for making new orders from the browser
+    if request.method == "GET":
+        products = Products.objects.all()
+        context = {"products": products}
+        return render(request, "orders/neworder.html", context)
+    
     if request.method == "POST":
         table = request.POST['table_number']
 

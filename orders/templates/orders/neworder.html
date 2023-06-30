@@ -8,8 +8,7 @@
     </div>
 </nav>
 </div>
-<form class="navbar-form navbar-right" method="post" name="neworder">
-    <fieldset>
+<form class="navbar-form navbar-left" method="post" name="neworder">
         {% csrf_token %}
         <div class="form-group">
             <label for="table_number"><h2>Table: </h2></label>
@@ -22,8 +21,8 @@
                 <option value={{ product.id }}>{{ product.name }}</option>
                 {% endfor %}
         </div>
-        <button type="submit" class="btn btn-default">OK</button>
-    </fieldset>
+        <br>
+    <button type="submit" class="btn btn-default">OK</button>
 </form>
 </div>
 {% endblock %}

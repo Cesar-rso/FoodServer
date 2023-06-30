@@ -13,6 +13,7 @@ urlpatterns = [path('api/place', views.PlaceOrder.as_view(), name='place-order')
                path('api/auth_token', obtain_auth_token, name='api_token'),
                path('login', views.login_request, name='login'),
                path('logout', views.logout_request, name='logout'),
+               path('new_order', views.new_order, name='new_order'),
                path('pay_orders', views.pay_orders, name='pay_orders'),
                path('products', views.ListProducts.as_view(), name='products'),
                path('new_product', views.ProductRegistration.as_view(), name='reg_product')] \
