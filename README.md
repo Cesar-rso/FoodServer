@@ -15,10 +15,10 @@
  {}
  
  ***It returns the following:***
-{"order": order_number,
- "products": {"product1": product_id, "product2": product_id, ...},
- "table": table_number,
- "status": order_status}
+{"order": integer,
+ "products": {"product1": integer, "product2": integer, ...},
+ "table": integer,
+ "status": string}
  
 
 ### URL 'api/place'
@@ -29,9 +29,9 @@ POST
 
 
 ***body:***
-{"products": {"product1": product_id, "product2": product_id, ...},
- "table": table_number,
- "status": order_status} 
+{"products": {"product1": integer, "product2": integer, ...},
+ "table": integer,
+ "status": string} 
  
  ***It returns the following:***  
  {"status": "Order placed!"}
@@ -44,7 +44,7 @@ POST
  
  
  ***body:*** 
- {"table": table_number}
+ {"table": integer}
  
  *** It returns the following: ***
  {"status": "Order canceled!"}
@@ -61,9 +61,9 @@ GET
 {} 
  
 ***It returns the following:***
-{"name": product_name
- "description": product_description
- "price": product_price}
+{"name": string
+ "description": string
+ "price": float}
  
  
  ### URL 'api/auth_token'
@@ -74,8 +74,8 @@ GET
  
  
  ***body:*** 
-{"username": username, 
-"password": password} 
+{"username": string, 
+"password": string} 
 
 ***It returns the following:***
-{ 'token' : '9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' }
+{ 'token' : string }

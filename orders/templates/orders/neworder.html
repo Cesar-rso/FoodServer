@@ -15,14 +15,18 @@
             <input type="number" id="table_number" class="form-control" name="table_number" value="">
         </div>
         <div class="form-group">
-            <label for="order_items"><h2>Items: </h2></label>
-            <select id="order_items" class="form-control" name="order_items" multiple>
+            <h2>Items: </h2>
+            <div id="order_items" style="overflow:scroll; height:400px;" class="form-control" size=5 name="order_items">
                 {% for product in products %}
-                <option value={{ product.id }}>{{ product.name }}</option>
+                <input type="checkbox" id="{{ product.name }}" value={{ product.id }}>
+                <label for="{{ product.name }}">{{ product.name }}</label> ------- 
+                <input type="number" id="{{ product.name }}_qtd" value="">
+                <br>
                 {% endfor %}
+            </div>
         </div>
         <br>
-    <button type="submit" class="btn btn-default">OK</button>
+    <button type="submit" class="btn btn-default" style="width:200px;">OK</button>
 </form>
 </div>
 {% endblock %}
