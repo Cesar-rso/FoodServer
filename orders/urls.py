@@ -4,7 +4,8 @@ from django.conf import settings
 from . import views
 from rest_framework.authtoken.views import obtain_auth_token
 
-urlpatterns = [path('api/place', views.PlaceOrder.as_view(), name='place-order'),
+urlpatterns = [path('', views.home, name='home'),
+               path('api/place', views.PlaceOrder.as_view(), name='place-order'),
                path('api/check-order', views.CheckOrder.as_view(), name='check-order'),
                path('checkout', views.Checkout.as_view(), name='checkout'),
                path('api/cancel', views.CancelOrder.as_view(), name='cancel-order'),

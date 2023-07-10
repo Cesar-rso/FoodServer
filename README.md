@@ -33,7 +33,7 @@ POST
  "table": integer,
  "status": string} 
  
- ***It returns the following:***  
+ ***It returns the following:***
  {"status": "Order placed!"}
  
  ### URL 'api/cancel'
@@ -46,7 +46,7 @@ POST
  ***body:*** 
  {"table": integer}
  
- *** It returns the following: ***
+ ***It returns the following:***
  {"status": "Order canceled!"}
  
  

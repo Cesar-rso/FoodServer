@@ -96,7 +96,7 @@ class CheckProduct(APIView):
 
 class ControlOrders(generic.ListView):
     # View that gives employees in the kitchen full control of the orders made by waiters
-    template_name = 'orders/index.html'
+    template_name = 'orders/orders.html'
     context_object_name = 'all_orders'
 
     def get_queryset(self):
@@ -171,6 +171,11 @@ class ProductRegistration(CreateView):
     template_name = "orders/product-form.html"
 
 
+def home(request):
+    context = {}
+    return render(request, "orders/index.html", context)
+
+
 def new_order(request):
     # Method for making new orders from the browser
     if request.method == "GET":
@@ -221,7 +226,7 @@ def login_request(request):
         if user is not None:
             if user.is_active:  # check if user account is not banned/blocked
                 login(request, user)
-                return redirect('orders')
+                return redirect('home')
         else:
             context['message'] = "Invalid username or password."
             return render(request, 'orders/error.html', context)
@@ -230,4 +235,4 @@ def login_request(request):
 def logout_request(request):
     # Basic logout method
     logout(request)
-    return redirect('orders')
+    return redirect('home')

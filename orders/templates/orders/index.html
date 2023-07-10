@@ -1,42 +1,8 @@
 {% extends 'orders/base.html' %}
-{% block title %}Orders{% endblock %}
+{% block title %}Home{% endblock %}
 {% block body %}
-    <h1 style="background-color:Tomato;">Orders</h1>
-    {% if all_orders %}
-        <ul>
-        {% for order in all_orders%}
-            {% if order.status != 'PA' %}
-                <li><h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3>
-
-            {% if user.is_authenticated %}
-                {% if order.status == 'CA' %}
-                    <form method="post">
-                        {% csrf_token %}
-                    <button name="delete" type="submit" value="{{ order.id }}">Delete Order</button>
-                    </form>
-                {% endif %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <select name="status" id="status">
-                            <option value="WA">Waiting</option>
-                            <option value="DE">Delivered</option>
-                            <option value="PD">Partially Delivered</option>
-                            <option value="PP">Preparing</option>
-                            <option value="CA">Canceled</option>
-                        </select>
-                        <button name="submit" type="submit" value="{{ order.id }}">Change Status</button>
-                    </form>
-            {% endif %}
-            </li>
-            <br>
-            {% for product in order.product.all %}
-            <p> <b>-Item:</b> {{ product.name }} - ${{ product.price }}</p>
-            {% endfor %}
-            {% endif %}
-            <hr>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <h1>No new Orders</h1>
-    {% endif %}
+<h1 style="background-color:Tomato;">.</h1>
+<div style="margin: auto;">
+<p><h1 style="margin: auto; text-align: center; font-family: Lucida Handwriting, cursive;">Welcome to FoodServer</h1></p>
+</div>
 {% endblock %}
