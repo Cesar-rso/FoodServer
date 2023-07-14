@@ -5,6 +5,14 @@ from django.conf import settings
 from django.urls import reverse
 
 
+class Supplier(models.Model):
+
+    name = models.CharField(max_length=200)
+    address = models.CharField(max_length=200)
+    phone = models.IntegerField()
+    supply_type = models.CharField(max_length=200)
+
+
 class Payments(models.Model):
 
     value = models.FloatField(default=0.0)
@@ -20,6 +28,7 @@ class Products(models.Model):
     description = models.CharField(max_length=700)
     price = models.FloatField(default=0.0)
     picture = models.ImageField(upload_to='products/', default='default.jpg')
+    supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING)
 
     def get_absolute_url(self):
         return reverse('products')
@@ -40,6 +49,10 @@ class Order(models.Model):
     status = models.CharField(max_length=100, choices=Status.choices, default=Status.WAITING)
     date = models.DateTimeField(default=datetime.datetime.now)
     payment = models.ForeignKey(Payments, on_delete=models.DO_NOTHING, default=1)
+
+    def save(self, *args, **kwargs):
+        # Implementear resposta para atualização async
+        super.save(*args, **kwargs)
 
 
 class Waiters(models.Model):
