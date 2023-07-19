@@ -3,7 +3,7 @@
 {% block body %}
     <h1 style="background-color:Tomato;">Orders</h1>
     {% if all_orders %}
-        <ul>
+        <ul id="orders_list">
         {% for order in all_orders%}
             {% if order.status != 'PA' %}
                 <li><h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3>
@@ -39,4 +39,48 @@
     {% else %}
         <h1>No new Orders</h1>
     {% endif %}
+    {{ request.user.username|json_script:"user_username" }}
+    <script>
+        const user_username = JSON.parse(document.getElementById('user_username').textContent);
+
+        setTimeout(chatSocket.send(JSON.stringify({
+            'message': 'update',
+            'username': user_username,
+        }));, 2000);
+
+        const chatSocket = new WebSocket(
+            'ws://' +
+            window.location.host +
+            '/ws/orders/'
+        );
+
+        chatSocket.onmessage = function (e) {
+            const order = JSON.parse(e.data);
+            
+            const list_item = document.createElement('li');
+            list_item.innerHTML = `
+            <h3>Table: {{ order.table }} || Status: {{ order.status }}</h3>
+            
+            <form method="post">
+                {% csrf_token %}
+                <select name="status" id="status">
+                    <option value="WA">Waiting</option>
+                    <option value="DE">Delivered</option>
+                    <option value="PD">Partially Delivered</option>
+                    <option value="PP">Preparing</option>
+                    <option value="CA">Canceled</option>
+                </select>
+                <button name="submit" type="submit" value="{{ order.id }}">Change Status</button>
+            </form>
+            
+            <p> <b>-Item:</b> {{ product.name }} - $ {{ product.price }}</p>
+            
+          `;
+            document.getElementById('orders_list').appendChild(list_item);
+        }
+
+        function removeRow(input) {
+            document.getElementById('orders_list').removeChild(input.parentNode);
+        }
+    </script>
 {% endblock %}
