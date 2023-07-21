@@ -15,8 +15,14 @@ class Supplier(models.Model):
 
 class Payments(models.Model):
 
+    class PayType(models.TextChoices):
+        CASH = 'CA', _('Waiting')
+        DEBIT = 'DE', _('Debit Card')
+        CREDIT = 'CR', _('Credit Card')
+
     value = models.FloatField(default=0.0)
     date = models.DateTimeField(default=datetime.datetime.now)
+    method = models.CharField(max_length=100, choices=PayType.choices, default=PayType.CASH)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.DO_NOTHING,
@@ -27,11 +33,23 @@ class Products(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=700)
     price = models.FloatField(default=0.0)
+    cost = models.FloatField(default=0.0)
     picture = models.ImageField(upload_to='products/', default='default.jpg')
     supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING)
 
     def get_absolute_url(self):
         return reverse('products')
+
+
+class Inputs(models.Model):
+    products = models.ManyToManyField(Products, on_delete=models.DO_NOTHING)
+    supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING)
+    discount = models.IntegerField(default=0)
+    total = models.FloatField(default=0.0)
+
+    def save(self, *args, **kwargs):
+        # Implementear calculo de valor total com desconto
+        super.save(*args, **kwargs)
 
 
 class Order(models.Model):
