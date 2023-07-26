@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
 from django.urls import reverse
+from consumers import OrdersConsumer
 
 
 class Supplier(models.Model):
@@ -16,7 +17,7 @@ class Supplier(models.Model):
 class Payments(models.Model):
 
     class PayType(models.TextChoices):
-        CASH = 'CA', _('Waiting')
+        CASH = 'CA', _('Cash')
         DEBIT = 'DE', _('Debit Card')
         CREDIT = 'CR', _('Credit Card')
 
@@ -70,6 +71,10 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         # Implementear resposta para atualização async
+        socket = OrdersConsumer()
+        socket.connect()
+        socket.receive()
+        socket.disconnect()
         super.save(*args, **kwargs)
 
 

@@ -1,6 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Order
 from django.contrib.auth.models import User
+from datetime import datetime
 import json
 
 
@@ -11,8 +12,10 @@ class OrdersConsumer(AsyncWebsocketConsumer):
     #     self.room_group_name = ''
 
     async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'orders_%s' % self.room_name
+
+        current_date = str(datetime.today().year) + str(datetime.today().month) + str(datetime.today().day)
+        self.room_name = 'orders' #self.scope['url_route']
+        self.room_group_name = current_date + '_' + self.room_name
 
         await self.channel_layer.group_add(
             self.room_group_name,
