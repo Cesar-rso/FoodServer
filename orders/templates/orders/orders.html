@@ -41,6 +41,23 @@
     {% endif %}
     {{ request.user.username|json_script:"user_username" }}
     <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+        // const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // use this in case csrf_use_sessions = true 
         const user_username = JSON.parse(document.getElementById('user_username').textContent);
 
         setTimeout(chatSocket.send(JSON.stringify({
@@ -59,10 +76,10 @@
             
             const list_item = document.createElement('li');
             list_item.innerHTML = `
-            <h3>Table: {{ order.table }} || Status: {{ order.status }}</h3>
+            <h3>Table: ${order.table} || Status: ${order.status}</h3>
             
             <form method="post">
-                {% csrf_token %}
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}" />
                 <select name="status" id="status">
                     <option value="WA">Waiting</option>
                     <option value="DE">Delivered</option>
@@ -70,12 +87,15 @@
                     <option value="PP">Preparing</option>
                     <option value="CA">Canceled</option>
                 </select>
-                <button name="submit" type="submit" value="{{ order.id }}">Change Status</button>
+                <button name="submit" type="submit" value="${order.id}">Change Status</button>
             </form>
             
-            <p> <b>-Item:</b> {{ product.name }} - $ {{ product.price }}</p>
-            
           `;
+            for (let product of order.product){
+                list_item.innerHTML += `<p> <b>-Item:</b> ${product.name} - $${product.price}</p>
+                
+                `
+            }
             document.getElementById('orders_list').appendChild(list_item);
         }
 

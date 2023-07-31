@@ -73,7 +73,8 @@ class Order(models.Model):
         # Implementear resposta para atualização async
         socket = OrdersConsumer()
         socket.connect()
-        socket.receive()
+        data = {'message': {'product': self.product, 'table': self.table, 'status': self.status, 'date': self.date, 'payment': self.payment}, 'username': 'system'}
+        socket.receive(data)
         socket.disconnect()
         super.save(*args, **kwargs)
 
