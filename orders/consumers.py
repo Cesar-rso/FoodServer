@@ -1,5 +1,5 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Order
+# from .models import Order
 from django.contrib.auth.models import User
 from datetime import datetime
 import json

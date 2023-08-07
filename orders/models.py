@@ -3,15 +3,15 @@ from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
 from django.urls import reverse
-from consumers import OrdersConsumer
+from .consumers import OrdersConsumer
 
 
 class Supplier(models.Model):
 
-    name = models.CharField(max_length=200)
-    address = models.CharField(max_length=200)
-    phone = models.IntegerField()
-    supply_type = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, default='')
+    address = models.CharField(max_length=200, default='')
+    phone = models.IntegerField(default=00000000)
+    supply_type = models.CharField(max_length=200, default='')
 
 
 class Payments(models.Model):
@@ -36,14 +36,14 @@ class Products(models.Model):
     price = models.FloatField(default=0.0)
     cost = models.FloatField(default=0.0)
     picture = models.ImageField(upload_to='products/', default='default.jpg')
-    supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING)
+    supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING, default=0)
 
     def get_absolute_url(self):
         return reverse('products')
 
 
 class Inputs(models.Model):
-    products = models.ManyToManyField(Products, on_delete=models.DO_NOTHING)
+    products = models.ManyToManyField(Products)
     supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING)
     discount = models.IntegerField(default=0)
     total = models.FloatField(default=0.0)
