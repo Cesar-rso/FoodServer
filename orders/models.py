@@ -76,11 +76,14 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         # Implementear resposta para atualização async
-        socket = OrdersConsumer()
-        socket.connect()
-        data = {'message': {'product': self.product, 'table': self.table, 'status': self.status, 'date': self.date, 'payment': self.payment}, 'username': 'system'}
-        socket.receive(data)
-        socket.disconnect()
+        try:
+            socket = OrdersConsumer()
+            socket.connect()
+            data = {'message': {'product': self.product, 'table': self.table, 'status': self.status, 'date': self.date, 'payment': self.payment}, 'username': 'system'}
+            socket.receive(data)
+            socket.disconnect()
+        except:
+            print("Async socket failed!")
         super.save(*args, **kwargs)
 
 

@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 from .serializers import OrderSerializer, ProductSerializer
 from .models import Order, Products, Payments
 import requests
@@ -187,8 +188,11 @@ def new_order(request):
         table = request.POST['table_number']
 
         context = {'table': table, 'status':'WA', 'products': []}
-        response = requests.post(request.build_absolute_uri(reverse('new-order')), json=context)
-        data = response.json
+        token = Token.objects.get_or_create(user=request.user)
+        t_header = {"Authorization": f'Token {token[0].key}', "Content-Type": "application/json"}
+        response = requests.post(request.build_absolute_uri(reverse('new_order')), data=context, headers=t_header)
+        data = response.json()
+        print(data)
 
         if data["status"] == "Pedido adicionado com sucesso!":
             return redirect('new_order')
