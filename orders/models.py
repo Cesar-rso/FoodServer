@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
 from django.urls import reverse
-from .consumers import OrdersConsumer
+# from .consumers import OrdersConsumer
 
 
 class Supplier(models.Model):
@@ -71,10 +71,10 @@ class Order(models.Model):
     product = models.ManyToManyField(Products)
     table = models.IntegerField(default=1)
     status = models.CharField(max_length=100, choices=Status.choices, default=Status.WAITING)
-    date = models.DateTimeField(default=datetime.datetime.now)
+    date = models.DateTimeField(auto_now_add=True)
     payment = models.ForeignKey(Payments, on_delete=models.DO_NOTHING, default=1)
 
-    def save(self, *args, **kwargs):
+    '''def save(self, *args, **kwargs):
         # Implementear resposta para atualização async
         try:
             socket = OrdersConsumer()
@@ -84,7 +84,7 @@ class Order(models.Model):
             socket.disconnect()
         except:
             print("Async socket failed!")
-        super.save(*args, **kwargs)
+        super.save(*args, **kwargs)'''
 
 
 class Waiters(models.Model):

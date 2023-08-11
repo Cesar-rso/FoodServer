@@ -1,5 +1,5 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-# from .models import Order
+from .models import Order
 from django.contrib.auth.models import User
 from datetime import datetime
 import json
@@ -33,8 +33,9 @@ class OrdersConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        # message = text_data_json['message']
         username = text_data_json['username']
+        message = Order.objects.filter(date__gt=text_data_json['last_order'])
 
         await self.channel_layer.group_send(
             self.room_group_name,

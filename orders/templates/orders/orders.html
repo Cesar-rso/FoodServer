@@ -38,8 +38,13 @@
         </ul>
     {% else %}
         <h1>No new Orders</h1>
+        <ul id="orders_list">
+        </ul>
     {% endif %}
     {{ request.user.username|json_script:"user_username" }}
+    {% with all_orders|first as last_order %}
+    {{ last_order|json_script:"last_order"}}
+    {% endwith %}
     <script>
         function getCookie(name) {
             let cookieValue = null;
@@ -61,7 +66,7 @@
         const user_username = JSON.parse(document.getElementById('user_username').textContent);
 
         setTimeout(chatSocket.send(JSON.stringify({
-            'message': 'update',
+            'message': last_order.date,
             'username': user_username,
         }));, 2000);
 
