@@ -36,7 +36,7 @@ class Products(models.Model):
     price = models.FloatField(default=0.0)
     cost = models.FloatField(default=0.0)
     picture = models.ImageField(upload_to='products/', default='default.jpg')
-    supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING, default=0)
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, default=0, null=True)
 
     def get_absolute_url(self):
         return reverse('products')
@@ -44,7 +44,7 @@ class Products(models.Model):
 
 class Inputs(models.Model):
     products = models.ManyToManyField(Products)
-    supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING)
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True)
     discount = models.IntegerField(default=0)
     total = models.FloatField(default=0.0)
 
@@ -72,7 +72,7 @@ class Order(models.Model):
     table = models.IntegerField(default=1)
     status = models.CharField(max_length=100, choices=Status.choices, default=Status.WAITING)
     date = models.DateTimeField(auto_now_add=True)
-    payment = models.ForeignKey(Payments, on_delete=models.DO_NOTHING, default=1)
+    payment = models.ForeignKey(Payments, on_delete=models.SET_NULL, default=1, null=True)
 
     '''def save(self, *args, **kwargs):
         # Implementear resposta para atualização async

@@ -4,12 +4,12 @@
  
  ## API structure
  
- ### URL 'api/check-order'
+ ### URL 'api/order'
  ***method:***
  GET
  
  ***parameters:***
- "table": integer
+ "table": integer - (optional)
  
  ***body:*** 
  {}
@@ -21,7 +21,7 @@
  "status": string}
  
 
-### URL 'api/place'
+### ___________________________________________________________
 ***method:***
 POST
 
@@ -36,9 +36,9 @@ POST
  ***It returns the following:***
  {"status": "Order placed!"}
  
- ### URL 'api/cancel'
+ ### ___________________________________________________________
  ***method:***
-POST
+DELETE
 
  ***parameters:***
  

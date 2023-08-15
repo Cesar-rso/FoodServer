@@ -14,10 +14,23 @@ from .models import Order, Products, Payments
 import requests
 
 
-class PlaceOrder(APIView):
-    # REST API view where waiters place orders. The waiter must be an authenticated user
+class Order(APIView):
+    # REST API view where waiters handle orders. The waiter must be an authenticated user
     permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser,)
+
+    def get(self, request):
+        data = request.GET
+
+        if data['table']:
+            order = Order.objects.filter(table=data['table']).order_by('date').first()
+        else:
+            order = Order.objects.all()
+
+        serializer = OrderSerializer(order)
+        response = serializer.data
+
+        return Response(response)
 
     def post(self, request):
         data = request.data
@@ -25,43 +38,20 @@ class PlaceOrder(APIView):
         order = Order(table=data['table'], status=data['status'])
         order.save()
         products = data['products']
-        #counter = 0
+        
         stats = "Order placed!"
         for product in products:
             try:
                 p1 = Products.objects.get(pk=products[product])
                 order.product.add(p1)
-                #counter += 1
+                
             except Exception as e:
                 stats = "Error! Could not find product!"
         resp = {"status": stats}
 
         return Response(resp)
-
-
-class CheckOrder(APIView):
-    # REST API view where waiters can check specific orders (status, products, etc)
-    parser_classes = (JSONParser,)
-
-    def get(self, request):
-        data = request.GET
-        order = Order.objects.filter(table=data['table']).order_by('date').first()
-        serializer = OrderSerializer(order)
-
-        if order is None:
-            response = {"exception": "Couldn't find requested order!"}
-        else:
-            response = serializer.data
-
-        return Response(response)
-
-
-class CancelOrder(APIView):
-    # REST API view for waiters to cancel orders. The waiter must be an authenticated user
-    permission_classes = (IsAuthenticated,)
-    parser_classes = (JSONParser,)
-
-    def post(self, request):
+    
+    def delete(self, request):
         data = request.data
 
         try:
@@ -190,12 +180,12 @@ def new_order(request):
         context = {'table': table, 'status':'WA', 'products': []}
         token = Token.objects.get_or_create(user=request.user)
         t_header = {"Authorization": f'Token {token[0].key}', "Content-Type": "application/json"}
-        response = requests.post(request.build_absolute_uri(reverse('new_order')), data=context, headers=t_header)
+        response = requests.post(request.build_absolute_uri(reverse('api-orders')), data=context, headers=t_header)
         data = response.json()
         print(data)
 
         if data["status"] == "Pedido adicionado com sucesso!":
-            return redirect('new_order')
+            return redirect('orders')
         else:
             return render(request, "error.html", {"message": "Erro ao realizar pedido!"})
 

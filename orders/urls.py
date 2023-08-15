@@ -5,10 +5,8 @@ from . import views
 from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [path('', views.home, name='home'),
-               path('api/place', views.PlaceOrder.as_view(), name='place-order'),
-               path('api/check-order', views.CheckOrder.as_view(), name='check-order'),
+               path('api/order', views.Order.as_view(), name='api-orders'),
                path('checkout', views.Checkout.as_view(), name='checkout'),
-               path('api/cancel', views.CancelOrder.as_view(), name='cancel-order'),
                path('api/product', views.CheckProduct.as_view(), name='check-product'),
                path('orders', views.ControlOrders.as_view(), name='orders'),
                path('api/auth_token', obtain_auth_token, name='api_token'),
