@@ -10,7 +10,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from .serializers import OrderSerializer, ProductSerializer
-from .models import Order, Products, Payments
+from .models import *
 import requests
 
 
@@ -51,36 +51,51 @@ class Order(APIView):
 
         return Response(resp)
     
-    def delete(self, request):
+    def put(self, request):
         data = request.data
 
         try:
             order = Order.objects.filter(table=data['table']).order_by('date').first()
             if order is None:
-                resp = {"exception": "Couldn't find requested product!"}
+                resp = {"exception": "Couldn't find requested order!"}
             else:
                 order.status = Order.Status.CANCELED
                 order.save()
                 resp = {"status": "Order canceled!"}
         except ObjectDoesNotExist:
-            resp = {"exception": "Couldn't find requested product!"}
+            resp = {"exception": "Couldn't find requested order!"}
 
         return Response(resp)
 
 
-class CheckProduct(APIView):
-    # REST API view where waiters can search for specific products
+class Product(APIView):
+    # REST API view to handle products
     parser_classes = (JSONParser,)
 
     def get(self, request):
 
         data = request.GET
-        try:
-            products = Products.objects.get(pk=int(data['id']))
-            serializer = ProductSerializer(products)
-            resp = serializer.data
-        except ObjectDoesNotExist:
-            resp = {"exception": "Couldn't find requested product!"}
+        if data['id']:
+            products = Products.objects.get(pk=int(data['id']))       
+        else:
+            products = Products.objects.all()
+
+        serializer = ProductSerializer(products)
+        resp = serializer.data
+
+        return Response(resp)
+    
+    def post(self, request):
+        data = request.data 
+
+        product = Products(name = data['name'], description=data['description'], price=data['price'], cost=data['cost'], picture=data['picture'])
+        product.save()
+        supplier = Supplier.objects.get(id=data['supplier'])
+
+        if supplier:
+            product.supplier = supplier
+            product.save()
+        resp = {"status": "New product successfully registered!"}
 
         return Response(resp)
 

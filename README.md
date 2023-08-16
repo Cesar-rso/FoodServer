@@ -38,7 +38,7 @@ POST
  
  ### ___________________________________________________________
  ***method:***
-DELETE
+PUT
 
  ***parameters:***
  
@@ -55,7 +55,7 @@ DELETE
 GET
 
 ***parameters:***
- "id": integer
+ "id": integer - (optional)
 
 ***body:*** 
 {} 
@@ -64,6 +64,19 @@ GET
 {"name": string
  "description": string
  "price": float}
+
+ ### ___________________________________________________________
+ ***method:***
+POST
+
+ ***parameters:***
+ 
+ 
+ ***body:*** 
+ {"name": string, "description": string, "price": float, "cost": float, "picture": string, "supplier": integer}
+ 
+ ***It returns the following:***
+ {"status": "New product successfully registered!"}
  
  
  ### URL 'api/auth_token'
