@@ -36,9 +36,9 @@ POST
  ***It returns the following:***
  {"status": "Order placed!"}
  
- ### ___________________________________________________________
+### ___________________________________________________________
  ***method:***
-PUT
+DELETE
 
  ***parameters:***
  
@@ -65,7 +65,7 @@ GET
  "description": string
  "price": float}
 
- ### ___________________________________________________________
+### ___________________________________________________________
  ***method:***
 POST
 
@@ -78,6 +78,31 @@ POST
  ***It returns the following:***
  {"status": "New product successfully registered!"}
  
+### ___________________________________________________________
+ ***method:***
+PUT
+
+ ***parameters:***
+ 
+ 
+ ***body:*** 
+ {"id": integer, "name": string, "description": string, "price": float, "cost": float, "picture": string, "supplier": integer}
+ 
+ ***It returns the following:***
+ {"status": "Product successfully updated!"}
+
+### ___________________________________________________________
+ ***method:***
+DELETE
+
+ ***parameters:***
+ 
+ 
+ ***body:*** 
+ {"id": integer}
+ 
+ ***It returns the following:***
+ {"status": "Product successfully deleted!"}
  
  ### URL 'api/auth_token'
  ***method:***

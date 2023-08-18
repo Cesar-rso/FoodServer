@@ -51,7 +51,7 @@ class Order(APIView):
 
         return Response(resp)
     
-    def put(self, request):
+    def delete(self, request):
         data = request.data
 
         try:
@@ -96,6 +96,40 @@ class Product(APIView):
             product.supplier = supplier
             product.save()
         resp = {"status": "New product successfully registered!"}
+
+        return Response(resp)
+    
+    def put(self, request):
+        data = request.data 
+
+        try:
+            product = Products.objects.get(pk=data['id'])
+            product.name = data['name']
+            product.description = data['description']
+            product.price = data['price']
+            product.cost = data['cost']
+            product.picture = data['picture']
+
+            supplier = Supplier.objects.get(pk=data['supplier'])
+            if supplier:
+                product.supplier = supplier
+
+            resp = {"status": "Product successfully updated!"}
+
+        except Exception as e:
+            resp = {"status": f"{e}"}
+
+        return Response(resp)
+    
+    def delete(self, request):
+        data = request.data 
+
+        try:
+            product = Products.objects.get(pk=data['id'])
+            product.delete()
+            resp = {"status": "Product successfully deleted!"}
+        except Exception as e:
+            resp = {"status": f"{e}"}
 
         return Response(resp)
 
