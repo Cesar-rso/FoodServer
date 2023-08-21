@@ -47,6 +47,30 @@ class Order(APIView):
                 
             except Exception as e:
                 stats = "Error! Could not find product!"
+        order.save()
+        resp = {"status": stats}
+
+        return Response(resp)
+    
+    def put(self, request):
+        data = request.data
+
+        order = Order.objects.get(pk=data['id'])
+        order.table = data['table']
+        order.status = data['status']
+        order.save()
+        
+        products = data['products']
+        
+        stats = "Order updated!"
+        for product in products:
+            try:
+                p1 = Products.objects.get(pk=products[product])
+                order.product.add(p1)
+                
+            except Exception as e:
+                stats = "Error! Could not find product!"
+        order.save()
         resp = {"status": stats}
 
         return Response(resp)

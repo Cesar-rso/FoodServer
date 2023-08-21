@@ -35,6 +35,22 @@ POST
  
  ***It returns the following:***
  {"status": "Order placed!"}
+
+ ### ___________________________________________________________
+***method:***
+PUT
+
+***parameters:***
+
+
+***body:***
+{"id": integer,
+ "products": {"product1": integer, "product2": integer, ...},
+ "table": integer,
+ "status": string} 
+ 
+ ***It returns the following:***
+ {"status": "Order updated!"}
  
 ### ___________________________________________________________
  ***method:***
@@ -73,7 +89,12 @@ POST
  
  
  ***body:*** 
- {"name": string, "description": string, "price": float, "cost": float, "picture": string, "supplier": integer}
+ {"name": string, 
+  "description": string, 
+   "price": float, 
+   "cost": float, 
+   "picture": string, 
+   "supplier": integer}
  
  ***It returns the following:***
  {"status": "New product successfully registered!"}
@@ -86,7 +107,13 @@ PUT
  
  
  ***body:*** 
- {"id": integer, "name": string, "description": string, "price": float, "cost": float, "picture": string, "supplier": integer}
+ {"id": integer, 
+  "name": string, 
+  "description": string, 
+  "price": float, 
+  "cost": float, 
+  "picture": string, 
+  "supplier": integer}
  
  ***It returns the following:***
  {"status": "Product successfully updated!"}
