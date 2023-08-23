@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import OrderSerializer, ProductSerializer
+from .serializers import *
 from .models import *
 import requests
 
@@ -156,6 +156,24 @@ class Product(APIView):
             resp = {"status": f"{e}"}
 
         return Response(resp)
+    
+
+class Suppliers(APIView):
+    permission_classes = (IsAuthenticated,)
+    parser_classes = (JSONParser,)
+
+    def get(self, request):
+        data = request.GET 
+
+        if data['id']:
+            suppliers = Supplier.objects.get(pk=data['id'])
+        else:
+            suppliers = Supplier.objects.all()
+
+        serializer = SupplierSerializer(suppliers)
+        response = serializer.data
+
+        return Response(response)
 
 
 class ControlOrders(generic.ListView):
