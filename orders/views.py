@@ -174,6 +174,41 @@ class Suppliers(APIView):
         response = serializer.data
 
         return Response(response)
+    
+    def post(self, request):
+        data = request.data 
+
+        supplier = Supplier(name=data['name'], address=data['address'], phone=data['phone'], supply_type=data['supply_type'])
+        supplier.save()
+
+        resp = {"status": "New supplier successfully registered!"}
+
+        return Response(resp)
+    
+    def put(self, request):
+        data = request.data 
+
+        supplier = Supplier.objects.get(pk=data['id'])
+        supplier.name = data['name']
+        supplier.address = data['address']
+        supplier.phone = data['phone']
+        supplier.supply_type = data['supply_type']
+        supplier.save()
+
+        resp = {"status": "Supplier successfully updated!"}
+        return Response(resp)
+    
+    def delete(self, request):
+        data = request.data 
+
+        try:
+            supplier = Supplier.objects.get(pk=data['id'])
+            supplier.delete()
+            resp = {"status": "Supplier deleted!"}
+        except Exception as e:
+            resp = {"status": f"{e}"}
+
+        return Response(resp)
 
 
 class ControlOrders(generic.ListView):
