@@ -14,7 +14,7 @@ from .models import *
 import requests
 
 
-class Order(APIView):
+class Orders(APIView):
     # REST API view where waiters handle orders. The waiter must be an authenticated user
     permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser,)
