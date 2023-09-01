@@ -6,28 +6,12 @@ from django.urls import reverse
 # from .consumers import OrdersConsumer
 
 
-class Supplier(models.Model):
+class Suppliers(models.Model):
 
     name = models.CharField(max_length=200, default='')
     address = models.CharField(max_length=200, default='')
     phone = models.IntegerField(default=00000000)
     supply_type = models.CharField(max_length=200, default='')
-
-
-class Payments(models.Model):
-
-    class PayType(models.TextChoices):
-        CASH = 'CA', _('Cash')
-        DEBIT = 'DE', _('Debit Card')
-        CREDIT = 'CR', _('Credit Card')
-
-    value = models.FloatField(default=0.0)
-    date = models.DateTimeField(default=datetime.datetime.now)
-    method = models.CharField(max_length=100, choices=PayType.choices, default=PayType.CASH)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.DO_NOTHING,
-    )
 
 
 class Products(models.Model):
@@ -36,7 +20,7 @@ class Products(models.Model):
     price = models.FloatField(default=0.0)
     cost = models.FloatField(default=0.0)
     picture = models.ImageField(upload_to='products/', default='default.jpg')
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, default=0, null=True)
+    supplier = models.ForeignKey(Suppliers, on_delete=models.SET_NULL, default=0, null=True)
 
     def get_absolute_url(self):
         return reverse('products')
@@ -44,7 +28,7 @@ class Products(models.Model):
 
 class Inputs(models.Model):
     products = models.ManyToManyField(Products)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True)
+    supplier = models.ForeignKey(Suppliers, on_delete=models.SET_NULL, null=True)
     discount = models.IntegerField(default=0)
     total = models.FloatField(default=0.0)
 
@@ -58,7 +42,7 @@ class Inputs(models.Model):
         super.save(*args, **kwargs)
 
 
-class Order(models.Model):
+class Orders(models.Model):
 
     class Status(models.TextChoices):
         WAITING = 'WA', _('Waiting')
@@ -72,7 +56,6 @@ class Order(models.Model):
     table = models.IntegerField(default=1)
     status = models.CharField(max_length=100, choices=Status.choices, default=Status.WAITING)
     date = models.DateTimeField(auto_now_add=True)
-    payment = models.ForeignKey(Payments, on_delete=models.SET_NULL, default=1, null=True)
 
     '''def save(self, *args, **kwargs):
         # Implementear resposta para atualização async
@@ -85,6 +68,22 @@ class Order(models.Model):
         except:
             print("Async socket failed!")
         super.save(*args, **kwargs)'''
+    
+class Payments(models.Model):
+
+    class PayType(models.TextChoices):
+        CASH = 'CA', _('Cash')
+        DEBIT = 'DE', _('Debit Card')
+        CREDIT = 'CR', _('Credit Card')
+
+    value = models.FloatField(default=0.0)
+    date = models.DateTimeField(default=datetime.datetime.now)
+    method = models.CharField(max_length=100, choices=PayType.choices, default=PayType.CASH)
+    order = models.ManyToManyField(Orders, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.DO_NOTHING,
+    )
 
 
 class Waiters(models.Model):

@@ -14,7 +14,7 @@ from .models import *
 import requests
 
 
-class Orders(APIView):
+class Order(APIView):
     # REST API view where waiters handle orders. The waiter must be an authenticated user
     # permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser,)
@@ -23,9 +23,9 @@ class Orders(APIView):
         data = request.GET
 
         if data['table']:
-            order = Order.objects.filter(table=data['table']).order_by('date').first()
+            order = Orders.objects.filter(table=data['table']).order_by('date').first()
         else:
-            order = Order.objects.all()
+            order = Orders.objects.all()
 
         serializer = OrderSerializer(order)
         response = serializer.data
@@ -35,7 +35,7 @@ class Orders(APIView):
     def post(self, request):
         data = request.data
 
-        order = Order(table=data['table'], status=data['status'])
+        order = Orders(table=data['table'], status=data['status'])
         order.save()
         products = data['products']
         
@@ -55,7 +55,7 @@ class Orders(APIView):
     def put(self, request):
         data = request.data
 
-        order = Order.objects.get(pk=data['id'])
+        order = Orders.objects.get(pk=data['id'])
         order.table = data['table']
         order.status = data['status']
         order.save()
@@ -79,11 +79,11 @@ class Orders(APIView):
         data = request.data
 
         try:
-            order = Order.objects.filter(table=data['table']).order_by('date').first()
+            order = Orders.objects.filter(table=data['table']).order_by('date').first()
             if order is None:
                 resp = {"exception": "Couldn't find requested order!"}
             else:
-                order.status = Order.Status.CANCELED
+                order.status = Orders.Status.CANCELED
                 order.save()
                 resp = {"status": "Order canceled!"}
         except ObjectDoesNotExist:
@@ -158,7 +158,7 @@ class Product(APIView):
         return Response(resp)
     
 
-class Suppliers(APIView):
+class Supplier(APIView):
     permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser,)
 
@@ -166,9 +166,9 @@ class Suppliers(APIView):
         data = request.GET 
 
         if data['id']:
-            suppliers = Supplier.objects.get(pk=data['id'])
+            suppliers = Suppliers.objects.get(pk=data['id'])
         else:
-            suppliers = Supplier.objects.all()
+            suppliers = Suppliers.objects.all()
 
         serializer = SupplierSerializer(suppliers)
         response = serializer.data
@@ -178,7 +178,7 @@ class Suppliers(APIView):
     def post(self, request):
         data = request.data 
 
-        supplier = Supplier(name=data['name'], address=data['address'], phone=data['phone'], supply_type=data['supply_type'])
+        supplier = Suppliers(name=data['name'], address=data['address'], phone=data['phone'], supply_type=data['supply_type'])
         supplier.save()
 
         resp = {"status": "New supplier successfully registered!"}
@@ -188,7 +188,7 @@ class Suppliers(APIView):
     def put(self, request):
         data = request.data 
 
-        supplier = Supplier.objects.get(pk=data['id'])
+        supplier = Suppliers.objects.get(pk=data['id'])
         supplier.name = data['name']
         supplier.address = data['address']
         supplier.phone = data['phone']
@@ -202,7 +202,7 @@ class Suppliers(APIView):
         data = request.data 
 
         try:
-            supplier = Supplier.objects.get(pk=data['id'])
+            supplier = Suppliers.objects.get(pk=data['id'])
             supplier.delete()
             resp = {"status": "Supplier deleted!"}
         except Exception as e:
@@ -217,16 +217,16 @@ class ControlOrders(generic.ListView):
     context_object_name = 'all_orders'
 
     def get_queryset(self):
-        return Order.objects.all().order_by('date')
+        return Orders.objects.all().order_by('date')
 
     def post(self, request):
         if 'submit' in request.POST.keys():
-            order = Order.objects.get(pk=request.POST['submit'])
+            order = Orders.objects.get(pk=request.POST['submit'])
             order.status = request.POST['status']
             order.save()
 
         if 'delete' in request.POST.keys():
-            order = Order.objects.get(pk=request.POST['delete'])
+            order = Orders.objects.get(pk=request.POST['delete'])
             order.delete()
 
         return redirect('orders')
@@ -238,12 +238,12 @@ class Checkout(generic.ListView):
     context_object_name = 'orders'
 
     def get_queryset(self):
-        return Order.objects.all().order_by('date')
+        return Orders.objects.all().order_by('date')
 
     def post(self, request):
         if 'search' in request.POST.keys() and request.POST['search'].isdecimal():
             table = request.POST['search']
-            orders = Order.objects.filter(table=table)
+            orders = Orders.objects.filter(table=table)
             total = 0.0
             for order in orders:
                 if order.status != "PA":
@@ -320,13 +320,13 @@ def pay_orders(request):
     # Method for saving payments and updating orders payment status
     if request.method == "POST":
         table = request.POST['pay']
-        orders = Order.objects.filter(table=table)
+        orders = Orders.objects.filter(table=table)
         payment = Payments.objects.create(user=request.user)
         total = 0.0
         for order in orders:
             for product in order.product.all():
                 total += product.price
-            order.payment = payment
+            payment.order = order
             order.status = "PA"
             order.save()
         payment.value = total
