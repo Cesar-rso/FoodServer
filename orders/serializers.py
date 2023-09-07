@@ -12,12 +12,12 @@ class ProductSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Order
+        model = Orders
         fields = '__all__'
 
 
 class SupplierSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Supplier
+        model = Suppliers
         fields = '__all__'

@@ -79,10 +79,11 @@ class Payments(models.Model):
     value = models.FloatField(default=0.0)
     date = models.DateTimeField(default=datetime.datetime.now)
     method = models.CharField(max_length=100, choices=PayType.choices, default=PayType.CASH)
-    order = models.ManyToManyField(Orders, on_delete=models.CASCADE)
+    order = models.ManyToManyField(Orders)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
 
