@@ -63,13 +63,6 @@
         // const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // use this in case csrf_use_sessions = true 
         const user_username = JSON.parse(document.getElementById('user_username').textContent);
 
-        setTimeout(chatSocket.send(JSON.stringify({
-            'message': {% with all_orders|first as last_order %}
-                        {{ last_order.date}}
-                       {% endwith %},
-            'username': user_username,
-        }));, 2000);
-
         const chatSocket = new WebSocket(
             'ws://' +
             window.location.host +
@@ -102,7 +95,21 @@
                 `
             }
             document.getElementById('orders_list').appendChild(list_item);
+
+            setTimeout(chatSocket.send(JSON.stringify({
+                'message': {% with all_orders|first as last_order %}
+                            {{ last_order.date}}
+                           {% endwith %},
+                'username': user_username,
+            }));, 2000);
         }
+
+        chatSocket.send(JSON.stringify({
+            'message': {% with all_orders|first as last_order %}
+                        {{ last_order.date}}
+                       {% endwith %},
+            'username': user_username,
+        }));
 
         function removeRow(input) {
             document.getElementById('orders_list').removeChild(input.parentNode);
