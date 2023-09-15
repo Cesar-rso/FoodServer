@@ -96,19 +96,16 @@
             }
             document.getElementById('orders_list').appendChild(list_item);
 
-            setTimeout(chatSocket.send(JSON.stringify({
-                'message': {% with all_orders|first as last_order %} {{ last_order.date|date:"Y-m-d" }} {% endwith %},
-                'username': user_username,
-            }));, 2000);
+            setTimeout(() => {
+                chatSocket.send(JSON.stringify({
+                    "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d' }}" {% endwith %},
+                    "username": user_username }));
+                }, 2000);
         }
 
         chatSocket.send(JSON.stringify({
-            'message': {% with all_orders|first as last_order %} {{ last_order.date|date:"Y-m-d" }} {% endwith %},
-            'username': user_username,
-        }));
+            "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d' }}" {% endwith %},
+            "username": user_username }));
 
-        function removeRow(input) {
-            document.getElementById('orders_list').removeChild(input.parentNode);
-        }
     </script>
 {% endblock %}

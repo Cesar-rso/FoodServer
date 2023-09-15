@@ -34,8 +34,9 @@ class OrdersConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         # message = text_data_json['message']
+        date_msg = datetime.strptime(text_data_json['message'], '%Y-%m-%d')
         username = text_data_json['username']
-        message = Order.objects.filter(date__gt=text_data_json['message'])
+        message = Order.objects.filter(date__gt=date_msg)
 
         await self.channel_layer.group_send(
             self.room_group_name,
