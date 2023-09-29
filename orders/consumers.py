@@ -1,58 +1,27 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Order
-from django.contrib.auth.models import User
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from .models import Orders
 from datetime import datetime
-import json
 
 
-class OrdersConsumer(AsyncWebsocketConsumer):
+class OrdersConsumer(AsyncJsonWebsocketConsumer):
 
-    # def __init__(self):
-    #     self.room_name = ''
-    #     self.room_group_name = ''
 
     async def connect(self):
 
-        current_date = str(datetime.today().year) + str(datetime.today().month) + str(datetime.today().day)
-        self.room_name = 'orders' #self.scope['url_route']
-        self.room_group_name = current_date + '_' + self.room_name
-
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-
         await self.accept()
 
-    async def disconnect(self, code):
 
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+    async def receive_json(self, content):
+        
+        date_msg = datetime.strptime(content['message'], '%Y-%m-%d')
+        username = content['username']
+        message = Orders.objects.filter(date__gt=date_msg)
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        # message = text_data_json['message']
-        date_msg = datetime.strptime(text_data_json['message'], '%Y-%m-%d')
-        username = text_data_json['username']
-        message = Order.objects.filter(date__gt=date_msg)
-
-        await self.channel_layer.group_send(
-            self.room_group_name,
+        await self.send_json(
             {
-                'type': 'room_message',
+                'type': 'websocket.send',
                 'message': message,
                 'username': username
             }
         )
-
-    async def room_message(self, event):
-        message = event['message']
-        username = event['username']
-
-        await self.send(text_data=json.dumps({
-            'message': message,
-            'username': username
-        }))
 
