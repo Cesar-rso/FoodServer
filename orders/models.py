@@ -52,7 +52,7 @@ class Orders(models.Model):
         CANCELED = 'CA', _('Canceled')
         PAID = 'PA', _('Paid')
 
-    product = models.ManyToManyField(Products, null=True)
+    product = models.ManyToManyField(Products)
     table = models.IntegerField(default=1)
     status = models.CharField(max_length=100, choices=Status.choices, default=Status.WAITING)
     date = models.DateTimeField(auto_now_add=True)
