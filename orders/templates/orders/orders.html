@@ -70,6 +70,7 @@
             '/ws/orders/'
         );
 
+
         function UpdateOrders (e) {
             const order = JSON.parse(e.data);
             
@@ -105,13 +106,12 @@
         }
 
         chatSocket.onmessage = function(event) { UpdateOrders(event); };
-        /*chatSocket.addEventListener("message", (event) => {
-            UpdateOrders(event);
-        });*/
 
-       /* chatSocket.send(JSON.stringify({
+        chatSocket.addEventListener("add", (event) => {
+            chatSocket.send(JSON.stringify({
             "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d' }}" {% endwith %},
-            "username": user_username }));*/
+            "username": user_username }));
+        });
 
     </script>
 {% endblock %}
