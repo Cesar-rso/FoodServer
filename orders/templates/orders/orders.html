@@ -70,39 +70,43 @@
             '/ws/orders/'
         );
 
-
         function UpdateOrders (e) {
-            const order = JSON.parse(e.data);
-            
-            const list_item = document.createElement('li');
-            list_item.innerHTML = `
-            <h3>Table: ${order.table} || Status: ${order.status}</h3>
-            
-            <form method="post">
-                <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}" />
-                <select name="status" id="status">
-                    <option value="WA">Waiting</option>
-                    <option value="DE">Delivered</option>
-                    <option value="PD">Partially Delivered</option>
-                    <option value="PP">Preparing</option>
-                    <option value="CA">Canceled</option>
-                </select>
-                <button name="submit" type="submit" value="${order.id}">Change Status</button>
-            </form>
-            
-          `;
-            for (let product of order.product){
-                list_item.innerHTML += `<p> <b>-Item:</b> ${product.name} - $${product.price}</p>
-                
-                `
-            }
-            document.getElementById('orders_list').appendChild(list_item);
+            const json_data = JSON.parse(e.data);
+            const order = json_data.message
+            var count = Object.keys(order).length;
 
-            setTimeout(() => {
-                chatSocket.send(JSON.stringify({
-                    "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d' }}" {% endwith %},
-                    "username": user_username }));
-                }, 2000);
+            if (count > 0) {
+                const list_item = document.createElement('li');
+                list_item.innerHTML = `
+                <h3>Table: ${order.table} || Status: ${order.status}</h3>
+                
+                <form method="post">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}" />
+                    <select name="status" id="status">
+                        <option value="WA">Waiting</option>
+                        <option value="DE">Delivered</option>
+                        <option value="PD">Partially Delivered</option>
+                        <option value="PP">Preparing</option>
+                        <option value="CA">Canceled</option>
+                    </select>
+                    <button name="submit" type="submit" value="${order.id}">Change Status</button>
+                </form>
+                
+            `;
+                
+                for (let product of order.products){
+                    list_item.innerHTML += `<p> <b>-Item:</b> ${product.name} - $${product.price}</p>
+                    
+                    `
+                }
+                document.getElementById('orders_list').appendChild(list_item);
+
+                setTimeout(() => {
+                    chatSocket.send(JSON.stringify({
+                        "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d' }}" {% endwith %},
+                        "username": user_username }));
+                    }, 2000);
+            }
         }
 
         chatSocket.onmessage = function(event) { UpdateOrders(event); };
