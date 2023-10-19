@@ -34,7 +34,7 @@ class OrdersConsumer(AsyncJsonWebsocketConsumer):
 @database_sync_to_async
 def get_Orders(date: datetime) -> dict:
 
-    orders = Orders.objects.filter(date__gt=date)
+    orders = Orders.objects.filter(date__gt=date).order_by("date")[0]
     if orders:
         message = OrderSerializer(orders).data
     else:
