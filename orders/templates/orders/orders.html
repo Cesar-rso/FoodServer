@@ -109,7 +109,7 @@
             } else {
                 const now = new Date(); 
                 chatSocket.send(JSON.stringify({
-                    "message": now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() {% endwith %},
+                    "message": now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate(),
                     "username": user_username }));
             }     
         }
