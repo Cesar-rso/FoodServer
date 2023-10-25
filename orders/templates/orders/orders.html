@@ -103,13 +103,13 @@
 
                 setTimeout(() => {
                     chatSocket.send(JSON.stringify({
-                        "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d' }}" {% endwith %},
+                        "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:M' }}" {% endwith %},
                         "username": user_username }));
                     }, 2000);
             } else {
                 const now = new Date(); 
                 chatSocket.send(JSON.stringify({
-                    "message": now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate(),
+                    "message": now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes(),
                     "username": user_username }));
             }     
         }
@@ -118,7 +118,7 @@
 
         chatSocket.addEventListener("add", (event) => {
             chatSocket.send(JSON.stringify({
-            "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d' }}" {% endwith %},
+            "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:M' }}" {% endwith %},
             "username": user_username }));
         });
 

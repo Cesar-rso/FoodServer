@@ -11,14 +11,15 @@ class OrdersConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
 
         await self.accept()
-        content = {"username": "system", "message": str(datetime.today().year) + "-" + str(datetime.today().month) + "-" + str(datetime.today().day)}
+        current_time = str(datetime.today().year) + "-" + str(datetime.today().month) + "-" + str(datetime.today().day) + " " + str(datetime.today().hour) + ":" + str(datetime.today().minute)
+        content = {"username": "system", "message": current_time}
         await self.receive_json(content)
 
 
     async def receive_json(self, content):
         
         print("Receiving message...")
-        date_msg = datetime.strptime(content['message'], '%Y-%m-%d')
+        date_msg = datetime.strptime(content['message'], '%Y-%m-%d %h:%M')
         username = content['username']
         message = await get_Orders(date_msg)
 
