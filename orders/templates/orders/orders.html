@@ -94,7 +94,7 @@
                 
             `;
                 
-                for (let product of order.products){
+                for (let product of order.product){
                     list_item.innerHTML += `<p> <b>-Item:</b> ${product.name} - $${product.price}</p>
                     
                     `
@@ -103,7 +103,7 @@
 
                 setTimeout(() => {
                     chatSocket.send(JSON.stringify({
-                        "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:M' }}" {% endwith %},
+                        "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:i' }}" {% endwith %},
                         "username": user_username }));
                     }, 2000);
             } else {
@@ -118,7 +118,7 @@
 
         chatSocket.addEventListener("add", (event) => {
             chatSocket.send(JSON.stringify({
-            "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:M' }}" {% endwith %},
+            "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:i' }}" {% endwith %},
             "username": user_username }));
         });
 
