@@ -105,9 +105,11 @@
                     chatSocket.send(JSON.stringify({
                         "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:i' }}" {% endwith %},
                         "username": user_username }));
+                    console.log("1Checking django template...");
+                    console.log("{{ last_order.date|date:'Y-m-d h:i' }}");
                     }, 2000);
             } else {
-                const now = new Date(); 
+                const now = new Date();
                 chatSocket.send(JSON.stringify({
                     "message": now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes(),
                     "username": user_username }));
@@ -120,6 +122,8 @@
             chatSocket.send(JSON.stringify({
             "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:i' }}" {% endwith %},
             "username": user_username }));
+            console.log("2Checking django template...");
+            console.log("{{ last_order.date|date:'Y-m-d h:i' }}");
         });
 
     </script>

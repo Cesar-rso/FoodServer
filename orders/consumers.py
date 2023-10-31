@@ -18,10 +18,13 @@ class OrdersConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content):
         
-        print("Receiving message...")
+        print("Receiving message...", content['message'])
         date_msg = datetime.strptime(content['message'], '%Y-%m-%d %H:%M')
         username = content['username']
-        message = await get_Orders(date_msg)
+        try:
+            message = await get_Orders(date_msg)
+        except:
+            message = await get_Orders(datetime.now())
 
         await self.send_json(
             {
@@ -36,9 +39,10 @@ class OrdersConsumer(AsyncJsonWebsocketConsumer):
 def get_Orders(date: datetime) -> dict:
 
     orders = Orders.objects.filter(date__gt=date).order_by("date")
-    if orders:
+    if len(orders) > 0:
         message = OrderSerializer(orders[0]).data
     else:
         message = {}
+        print("No new orders!")
 
     return message
