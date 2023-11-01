@@ -63,6 +63,8 @@
         // const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // use this in case csrf_use_sessions = true 
         const user_username = JSON.parse(document.getElementById('user_username').textContent);
 
+        let last_order;
+
         // check websocket connection
         const chatSocket = new WebSocket(
             'ws://' +
@@ -73,9 +75,9 @@
         function UpdateOrders (e) {
             const json_data = JSON.parse(e.data);
             const order = json_data.message
-            var count = Object.keys(order).length;
+            let count = Object.keys(order).length;
 
-            if (count > 0) {
+            if (count > 0 && order.id != last_order) {
                 const list_item = document.createElement('li');
                 list_item.innerHTML = `
                 <h3>Table: ${order.table} || Status: ${order.status}</h3>
@@ -101,6 +103,8 @@
                 }
                 document.getElementById('orders_list').appendChild(list_item);
 
+                last_order = order.id;
+
                 setTimeout(() => {
                     chatSocket.send(JSON.stringify({
                         "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:i' }}" {% endwith %},
@@ -109,7 +113,7 @@
                     console.log("{{ last_order.date|date:'Y-m-d h:i' }}");
                     }, 2000);
             } else {
-                const now = new Date();
+                let now = new Date();
                 chatSocket.send(JSON.stringify({
                     "message": now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes(),
                     "username": user_username }));
