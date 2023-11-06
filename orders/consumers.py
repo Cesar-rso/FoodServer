@@ -18,7 +18,6 @@ class OrdersConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content):
         
-        print("Receiving message...", content['message'])
         date_msg = datetime.strptime(content['message'], '%Y-%m-%d %H:%M')
         username = content['username']
         try:

@@ -105,13 +105,9 @@
 
                 last_order = order.id;
 
-                setTimeout(() => {
-                    chatSocket.send(JSON.stringify({
+                chatSocket.send(JSON.stringify({
                         "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:i' }}" {% endwith %},
                         "username": user_username }));
-                    console.log("1Checking django template...");
-                    console.log("{{ last_order.date|date:'Y-m-d h:i' }}");
-                    }, 2000);
             } else {
                 let now = new Date();
                 chatSocket.send(JSON.stringify({
@@ -120,15 +116,7 @@
             }     
         }
 
-        chatSocket.onmessage = function(event) { UpdateOrders(event); };
-
-        chatSocket.addEventListener("add", (event) => {
-            chatSocket.send(JSON.stringify({
-            "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:i' }}" {% endwith %},
-            "username": user_username }));
-            console.log("2Checking django template...");
-            console.log("{{ last_order.date|date:'Y-m-d h:i' }}");
-        });
+        chatSocket.onmessage = function(event) { setTimeout(() => { UpdateOrders(event);}, 3000); };
 
     </script>
 {% endblock %}
