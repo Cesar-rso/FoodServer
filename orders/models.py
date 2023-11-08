@@ -57,17 +57,6 @@ class Orders(models.Model):
     status = models.CharField(max_length=100, choices=Status.choices, default=Status.WAITING)
     date = models.DateTimeField(auto_now_add=True)
 
-    '''def save(self, *args, **kwargs):
-        # Implementear resposta para atualização async
-        try:
-            socket = OrdersConsumer()
-            socket.connect()
-            data = {'message': {'product': self.product, 'table': self.table, 'status': self.status, 'date': self.date, 'payment': self.payment}, 'username': 'system'}
-            socket.receive(data)
-            socket.disconnect()
-        except:
-            print("Async socket failed!")
-        super.save(*args, **kwargs)'''
     
 class Payments(models.Model):
 
