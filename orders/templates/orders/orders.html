@@ -79,8 +79,35 @@
 
             if (count > 0 && order.id != last_order) {
                 const list_item = document.createElement('li');
+                let status_str;
+                switch(order.status){
+                    case "WA":
+                        status_str = "Waiting";
+                        break;
+
+                    case "DE":
+                        status_str = "Delivered";
+                        break;
+
+                    case "PD":
+                        status_str = "Partially Delivered";
+                        break;
+
+                    case "PP":
+                        status_str = "Preparing";
+                        break;
+
+                    case "CA":
+                        status_str = "Canceled";
+                        break;
+
+                    default:
+                        status_str = "Error!";
+                        break;
+
+                }
                 list_item.innerHTML = `
-                <h3>Table: ${order.table} || Status: ${order.status}</h3>
+                <h3>Table: ${order.table} || Status: ${status_str}</h3>
                 
                 <form method="post">
                     <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}" />
@@ -95,6 +122,7 @@
                 </form>
                 
             `;
+                console.log(order);
                 
                 for (let product of order.product){
                     list_item.innerHTML += `<p> <b>-Item:</b> ${product.name} - $${product.price}</p>
