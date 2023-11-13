@@ -76,6 +76,8 @@
             const json_data = JSON.parse(e.data);
             const order = json_data.message
             let count = Object.keys(order).length;
+            let now = new Date();
+            let message = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
 
             if (count > 0 && order.id != last_order) {
                 const list_item = document.createElement('li');
@@ -102,7 +104,7 @@
                         break;
 
                     default:
-                        status_str = "Error!";
+                        status_str = "Waiting";
                         break;
 
                 }
@@ -134,12 +136,11 @@
                 last_order = order.id;
 
                 chatSocket.send(JSON.stringify({
-                        "message": {% with all_orders|first as last_order %} "{{ last_order.date|date:'Y-m-d h:i' }}" {% endwith %},
+                        "message": message,
                         "username": user_username }));
             } else {
-                let now = new Date();
                 chatSocket.send(JSON.stringify({
-                    "message": now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes(),
+                    "message": message,
                     "username": user_username }));
             }     
         }

@@ -42,6 +42,5 @@ def get_Orders(date: datetime) -> dict:
         message = OrderSerializer(orders[0]).data
     else:
         message = {}
-        print("No new orders!")
 
     return message
