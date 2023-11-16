@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
 from django.urls import reverse
-# from .consumers import OrdersConsumer
 
 
 class Suppliers(models.Model):
@@ -12,6 +11,9 @@ class Suppliers(models.Model):
     address = models.CharField(max_length=200, default='')
     phone = models.IntegerField(default=00000000)
     supply_type = models.CharField(max_length=200, default='')
+
+    def get_absolute_url(self):
+        return reverse('home')
 
 
 class Products(models.Model):

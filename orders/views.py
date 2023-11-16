@@ -288,6 +288,13 @@ class ProductRegistration(CreateView):
     template_name = "orders/product-form.html"
 
 
+class SupplierRegistration(CreateView):
+    # Basic form view for adding new suppliers to the system
+    model = Suppliers
+    fields = '__all__'
+    template_name = "orders/supplier-form.html"
+
+
 def home(request):
     context = {}
     return render(request, "orders/index.html", context)
