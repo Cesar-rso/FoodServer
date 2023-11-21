@@ -10,7 +10,7 @@
 
             {% if user.is_authenticated %}
                 {% if order.status == 'CA' %}
-                    <form method="post">
+                    <form method="delete">
                         {% csrf_token %}
                     <button name="delete" type="submit" value="{{ order.id }}">Delete Order</button>
                     </form>

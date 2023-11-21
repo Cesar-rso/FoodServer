@@ -225,9 +225,11 @@ class ControlOrders(generic.ListView):
             order.status = request.POST['status']
             order.save()
 
-        if 'delete' in request.POST.keys():
-            order = Orders.objects.get(pk=request.POST['delete'])
-            order.delete()
+        return redirect('orders')
+    
+    def delete(self, request):
+        order = Orders.objects.get(pk=request.POST['delete'])
+        order.delete()
 
         return redirect('orders')
 
@@ -273,12 +275,12 @@ class ListProducts (generic.ListView):
             context = {'products': product}
 
             return render(request, 'orders/products.html', context)
+        
+    def delete(self, request):
+        product = Products.objects.get(pk=request.POST['submit'])
+        product.delete()
 
-        if 'submit' in request.POST.keys() and request.POST['submit'] != '':
-            product = Products.objects.get(pk=request.POST['submit'])
-            product.delete()
-
-            return redirect('products')
+        return redirect('products')
 
 
 class ProductRegistration(CreateView):

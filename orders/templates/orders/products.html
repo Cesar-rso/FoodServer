@@ -30,7 +30,7 @@
             - {{ product.description }}
             </li>
             <li>
-                <form method="post">
+                <form method="delete">
                         {% csrf_token %}
                     <button name="submit" type="submit" value="{{ product.id }}">Delete Product</button>
                 </form>
