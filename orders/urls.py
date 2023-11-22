@@ -16,6 +16,7 @@ urlpatterns = [path('', views.home, name='home'),
                path('new_order', views.new_order, name='new_order'),
                path('pay_orders', views.pay_orders, name='pay_orders'),
                path('products', views.ListProducts.as_view(), name='products'),
+               path('suppliers', views.ListSuppliers.as_view(), name='suppliers'),
                path('new_product', views.ProductRegistration.as_view(), name='reg_product'),
                path('new_supplier', views.SupplierRegistration.as_view(), name='reg_supplier')] \
               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \

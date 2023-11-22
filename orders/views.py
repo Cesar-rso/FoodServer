@@ -1,3 +1,5 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
@@ -281,6 +283,30 @@ class ListProducts (generic.ListView):
         product.delete()
 
         return redirect('products')
+    
+
+class ListSuppliers(generic.ListView):
+    template_name = "orders/suppliers.html"
+    context_object_name = "suppliers"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return Suppliers.objects.all().order_by('name')
+    
+    def post(self, request):
+        supp_id = request.POST['search']
+        if supp_id.isdecimal():
+            supplier = Suppliers.objects.filter(pk=int(supp_id))
+        else:
+            supplier = Suppliers.objects.filter(name=supp_id)
+        context = {'suppliers': supplier}
+
+        return render(request, 'order/suppliers.html', context)
+    
+    def delete(self, request):
+        supplier = Suppliers.objects.get(pk=request.POST['submit'])
+        supplier.delete()
+
+        return redirect('suppliers')
 
 
 class ProductRegistration(CreateView):
