@@ -1,0 +1,29 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Reports{% endblock %}
+{% block body %}
+    <nav class="navbar navbar-default" style="background-color:Tomato">
+        <div class="container-fluid">
+            <h1>Reports</h1>
+        </div>
+    </nav>
+<div>
+    <img src="media/{{ plot }}" alt="Data Graph" style="width:800px;height:600px;float:left;">
+    <form method="post">
+        {% csrf_token %}
+            <div class="form-group">
+                <select name="rep_type" id="rep_type">
+                    <option value="MS">Monthly Sales</option>
+                    <option value="SP">Sales/Product</option>
+                    <option value="ME">Monthly Expenses</option>
+                </select>
+                <label for="rep_type">Report Type</label>
+            </div>
+            <div class="form-group">
+                <input type="date" class="form-control" name="period" id="period" value="">
+                <label for="period">Period</label>
+            </div>
+            <button type="submit" class="btn btn-default">Generate Graph</button>
+    </form>
+</div>
+{% endblock %}

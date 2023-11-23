@@ -37,6 +37,9 @@
         <div class="navbar navbar-left">
             <a href="{% url 'checkout' %}"><h2 style="color:black"><pre> Checkout </pre></h2></a>
         </div>
+        <div class="navbar navbar-left">
+            <a href="{% url 'reports' %}"><h2 style="color:black"><pre> Reports </pre></h2></a>
+        </div>
         <form class="navbar-form navbar-right" role="logout" method="post" action="logout">
              {% csrf_token %}
                 <div class="form-group">
