@@ -1,4 +1,5 @@
 from typing import Any
+import matplotlib.pyplot as plt
 from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -367,6 +368,15 @@ def pay_orders(request):
         payment.value = total
         payment.save()
         return redirect('checkout')
+    
+
+def reports(request):
+    if request.method == "POST":
+        rep_type = request.POST['rep_type']
+        start_period = request.POST['start_period']
+        end_period = request.POST['end_period']
+
+    return render(request, "reports.html", {})
 
 
 def login_request(request):
