@@ -371,12 +371,21 @@ def pay_orders(request):
     
 
 def reports(request):
+    context = {}
+    context["plot"] = ""
+
     if request.method == "POST":
         rep_type = request.POST['rep_type']
         start_period = request.POST['start_period']
         end_period = request.POST['end_period']
 
-    return render(request, "reports.html", {})
+        if rep_type == "ME":
+            expenses = Inputs.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
+
+        if rep_type == "MS":
+            sales = Payments.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
+
+    return render(request, "reports.html", context)
 
 
 def login_request(request):

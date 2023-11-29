@@ -33,6 +33,7 @@ class Inputs(models.Model):
     supplier = models.ForeignKey(Suppliers, on_delete=models.SET_NULL, null=True)
     discount = models.IntegerField(default=0)
     total = models.FloatField(default=0.0)
+    date = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         # Implementear calculo de valor total com desconto
