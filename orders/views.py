@@ -384,6 +384,25 @@ def reports(request):
 
         if rep_type == "MS":
             sales = Payments.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
+            totals = {}
+
+            for sale in sales:
+                s_key = sale.date.month
+
+                if s_key in totals.keys():
+                    totals[s_key] += sale.value
+                else:
+                    totals[s_key] = sale.value
+
+            plt.bar(totals.keys(), totals.values())
+            plt.xlabel("Months ")
+            plt.ylabel("Total sales")
+
+            file = 'plot_sales_period' + str(start_period) + '.png'
+            plt.savefig('./orders/static/' + file)
+
+            context["plot"] = file
+
 
     return render(request, "reports.html", context)
 
