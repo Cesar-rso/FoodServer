@@ -381,6 +381,24 @@ def reports(request):
 
         if rep_type == "ME":
             expenses = Inputs.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
+            totals = {}
+
+            for expense in expenses:
+                e_key = expense.date.month
+
+                if e_key in totals.keys():
+                    totals[e_key] += expense.total
+                else:
+                    totals[e_key] += expense.total
+
+            plt.bar(totals.keys(), totals.values())
+            plt.xlabel("Months ")
+            plt.ylabel("Total expenses")
+
+            file = 'plot_expenses_period' + str(start_period) + '.png'
+            plt.savefig('./media/' + file)
+
+            context["plot"] = file
 
         if rep_type == "MS":
             sales = Payments.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
@@ -399,12 +417,12 @@ def reports(request):
             plt.ylabel("Total sales")
 
             file = 'plot_sales_period' + str(start_period) + '.png'
-            plt.savefig('./orders/static/' + file)
+            plt.savefig('./media/' + file)
 
             context["plot"] = file
 
 
-    return render(request, "reports.html", context)
+    return render(request, "orders/reports.html", context)
 
 
 def login_request(request):
