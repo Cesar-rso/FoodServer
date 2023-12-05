@@ -162,6 +162,7 @@ class Product(APIView):
     
 
 class Supplier(APIView):
+    # REST API view to handle suppliers
     permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser,)
 
@@ -287,6 +288,7 @@ class ListProducts (generic.ListView):
     
 
 class ListSuppliers(generic.ListView):
+    # View that lists all suppliers, allowing deletion and inclusion of new ones.
     template_name = "orders/suppliers.html"
     context_object_name = "suppliers"
 
@@ -330,7 +332,7 @@ def home(request):
 
 
 def new_order(request):
-    # Method for making new orders from the browser
+    # View for making new orders from the browser
     if request.method == "GET":
         products = Products.objects.all()
         context = {"products": products}
@@ -353,7 +355,7 @@ def new_order(request):
 
 
 def pay_orders(request):
-    # Method for saving payments and updating orders payment status
+    # View for saving payments and updating orders payment status
     if request.method == "POST":
         table = request.POST['pay']
         orders = Orders.objects.filter(table=table)
@@ -371,6 +373,7 @@ def pay_orders(request):
     
 
 def reports(request):
+    # View for generating graphs, like sales and expenses graphs
     context = {}
     context["plot"] = ""
 
@@ -378,10 +381,11 @@ def reports(request):
         rep_type = request.POST['rep_type']
         start_period = request.POST['start_period']
         end_period = request.POST['end_period']
+        totals = {}
+        labels = []
 
         if rep_type == "ME":
             expenses = Inputs.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
-            totals = {}
 
             for expense in expenses:
                 e_key = expense.date.month
@@ -391,18 +395,12 @@ def reports(request):
                 else:
                     totals[e_key] += expense.total
 
-            plt.bar(totals.keys(), totals.values())
-            plt.xlabel("Months ")
-            plt.ylabel("Total expenses")
-
-            file = 'plot_expenses_period' + str(start_period) + '.png'
-            plt.savefig('./media/' + file)
-
-            context["plot"] = file
+            labels.append("Months ")
+            labels.append("Total expenses")
+            labels.append('plot_expenses_period' + str(start_period) + '.png')
 
         if rep_type == "MS":
             sales = Payments.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
-            totals = {}
 
             for sale in sales:
                 s_key = sale.date.month
@@ -412,15 +410,16 @@ def reports(request):
                 else:
                     totals[s_key] = sale.value
 
-            plt.bar(totals.keys(), totals.values())
-            plt.xlabel("Months ")
-            plt.ylabel("Total sales")
+            labels.append("Months ")
+            labels.append("Total sales")
+            labels.append('plot_sales_period' + str(start_period) + '.png')
 
-            file = 'plot_sales_period' + str(start_period) + '.png'
-            plt.savefig('./media/' + file)
+    plt.bar(totals.keys(), totals.values())
+    plt.xlabel(labels[0])
+    plt.ylabel(labels[1])
+    plt.savefig('./media/' + labels[2])
 
-            context["plot"] = file
-
+    context["plot"] = labels[2]
 
     return render(request, "orders/reports.html", context)
 
