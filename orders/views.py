@@ -414,12 +414,15 @@ def reports(request):
             labels.append("Total sales")
             labels.append('plot_sales_period' + str(start_period) + '.png')
 
-    plt.bar(totals.keys(), totals.values())
-    plt.xlabel(labels[0])
-    plt.ylabel(labels[1])
-    plt.savefig('./media/' + labels[2])
+    try:
+        plt.bar(totals.keys(), totals.values())
+        plt.xlabel(labels[0])
+        plt.ylabel(labels[1])
+        plt.savefig('./media/' + labels[2])
 
-    context["plot"] = labels[2]
+        context["plot"] = labels[2]
+    except Exception as e:
+        print(e)
 
     return render(request, "orders/reports.html", context)
 

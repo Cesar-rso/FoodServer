@@ -8,8 +8,8 @@
         </div>
     </nav>
 <div>
-    <img src="media/{{ plot }}" alt="Data Graph" style="width:800px;height:600px;float:left;">
-    <form method="post">
+    <img src="media/{{ plot }}" alt="No Data Graph to show!" style="width:800px;height:600px;float:left;">
+    <form method="post" style="width:800px;height:600px;float:right;">
         {% csrf_token %}
             <div class="form-group">
                 <select name="rep_type" id="rep_type">
