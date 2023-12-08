@@ -414,6 +414,24 @@ def reports(request):
             labels.append("Total sales")
             labels.append('plot_sales_period' + str(start_period) + '.png')
 
+        if rep_type == "SP":
+            sales = Payments.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
+
+            for sale in sales:
+                for ord in sale.order:
+                    order = Orders.objects.get(id=ord)
+                    for prod in order.product:
+                        product = Products.objects.get(id=prod)
+
+                        if product.name in totals.keys():
+                            totals[product.name] += 1
+                        else:
+                            totals[product.name] = 1
+
+            labels.append("Products ")
+            labels.append("Total sales (quantity)")
+            labels.append('plot_ProductSales_period' + str(start_period) + '.png')
+
     try:
         plt.bar(totals.keys(), totals.values())
         plt.xlabel(labels[0])
