@@ -6,7 +6,8 @@
         <ul id="orders_list">
         {% for order in all_orders%}
             {% if order.status != 'PA' %}
-                <li><h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3>
+                <li><div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
+                    <h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3>
 
             {% if user.is_authenticated %}
                 {% if order.status == 'CA' %}
@@ -27,6 +28,7 @@
                         <button name="submit" type="submit" value="{{ order.id }}">Change Status</button>
                     </form>
             {% endif %}
+            </div>
             </li>
             <br>
             {% for product in order.product.all %}

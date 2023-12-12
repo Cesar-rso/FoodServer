@@ -21,21 +21,22 @@
 <ul style="list-style-type:none;">
 {% for product in products %}
     <li>
-        <ul style="list-style-type:none;">
-            <li style="height:400px;">
-                <img src="media/{{ product.picture }}" alt="Product Image" style="width:400px;height:300px;float:left;">
+        <div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
+            
+            <img src="media/{{ product.picture }}" alt="Product Image" style="width:150px;height:180px;float:left;">
 
             <h2> - {{ product.name }}</h2>
             <h2>  $ {{ product.price|floatformat:2 }}</h2><br>
             - {{ product.description }}
-            </li>
-            <li>
+           
+            <br>
+            
                 <form method="delete">
                         {% csrf_token %}
                     <button name="submit" type="submit" value="{{ product.id }}">Delete Product</button>
                 </form>
-            </li>
-        </ul>
+            
+        </div>
     </li>
 {% endfor %}
 </ul>
