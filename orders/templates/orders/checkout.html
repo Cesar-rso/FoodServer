@@ -17,6 +17,7 @@
     </nav>
     <ul>
     {% for order in orders %}
+        <div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
         {% if order.status != 'PA' %}
         <li><h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3></li>
         {% for product in order.product.all %}
@@ -24,6 +25,7 @@
         {% endfor %}
         {% endif %}
         <hr>
+        </div>
     {% endfor %}
     </ul>
 <nav class="navbar navbar-default" style="background-color:Tomato">

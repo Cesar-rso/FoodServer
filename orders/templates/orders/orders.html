@@ -111,6 +111,7 @@
 
                 }
                 list_item.innerHTML = `
+                <div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
                 <h3>Table: ${order.table} || Status: ${status_str}</h3>
                 
                 <form method="post">
@@ -124,6 +125,7 @@
                     </select>
                     <button name="submit" type="submit" value="${order.id}">Change Status</button>
                 </form>
+                </div>
                 
             `;
                 console.log(order);

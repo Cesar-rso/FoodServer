@@ -360,11 +360,12 @@ def pay_orders(request):
         table = request.POST['pay']
         orders = Orders.objects.filter(table=table)
         payment = Payments.objects.create(user=request.user)
+        payment.save()
         total = 0.0
         for order in orders:
             for product in order.product.all():
                 total += product.price
-            payment.order = order
+            payment.order.add(order)
             order.status = "PA"
             order.save()
         payment.value = total
