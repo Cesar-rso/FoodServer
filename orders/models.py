@@ -13,7 +13,10 @@ class Suppliers(models.Model):
     supply_type = models.CharField(max_length=200, default='')
 
     def get_absolute_url(self):
-        return reverse('home')
+        return reverse('suppliers')
+    
+    def __str__(self) -> str:
+        return self.name
 
 
 class Products(models.Model):
