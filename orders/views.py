@@ -419,10 +419,8 @@ def reports(request):
             sales = Payments.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
 
             for sale in sales:
-                for ord in sale.order:
-                    order = Orders.objects.get(id=ord)
-                    for prod in order.product:
-                        product = Products.objects.get(id=prod)
+                for order in sale.order.all():
+                    for product in order.product.all():
 
                         if product.name in totals.keys():
                             totals[product.name] += 1
