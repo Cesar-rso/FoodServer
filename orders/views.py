@@ -389,7 +389,7 @@ def reports(request):
             expenses = Inputs.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
 
             for expense in expenses:
-                e_key = expense.date.month
+                e_key = expense.date.strftime("%B")
 
                 if e_key in totals.keys():
                     totals[e_key] += expense.total
@@ -404,7 +404,7 @@ def reports(request):
             sales = Payments.objects.filter(date__gte=start_period).filter(date__lte=end_period).order_by("date")
 
             for sale in sales:
-                s_key = sale.date.month
+                s_key = sale.date.strftime("%B")
 
                 if s_key in totals.keys():
                     totals[s_key] += sale.value
