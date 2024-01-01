@@ -77,8 +77,8 @@ GET
 {} 
  
 ***It returns the following:***
-{"name": string
- "description": string
+{"name": string,
+ "description": string,
  "price": float}
 
 ### ___________________________________________________________
@@ -130,6 +130,69 @@ DELETE
  
  ***It returns the following:***
  {"status": "Product successfully deleted!"}
+
+
+ ### URL 'api/supplier'
+ ***method:***
+ GET
+
+ ***parameters:***
+ "id": integer - (optional)
+
+***body:*** 
+{} 
+ 
+***It returns the following:***
+{"name": string,
+ "address": string,
+ "phone": integer,
+ "supply_type": string}
+
+### ___________________________________________________________
+ ***method:***
+POST
+
+ ***parameters:***
+ 
+ 
+ ***body:*** 
+ {"name": string,
+ "address": string,
+ "phone": integer,
+ "supply_type": string}
+
+ ***It returns the following:***
+ {"status": "New supplier successfully registered!"}
+
+ ### ___________________________________________________________
+ ***method:***
+PUT
+
+ ***parameters:***
+ 
+ 
+ ***body:*** 
+ {"id": integer,
+  "name": string,
+ "address": string,
+ "phone": integer,
+ "supply_type": string}
+
+ ***It returns the following:***
+ {"status": "Supplier successfully updated!"}
+ ### ___________________________________________________________
+ ***method:***
+DELETE
+
+ ***parameters:***
+ 
+ 
+ ***body:*** 
+ {"id": integer}
+ 
+ ***It returns the following:***
+ {"status": "Supplier deleted!"}
+
  
  ### URL 'api/auth_token'
  ***method:***

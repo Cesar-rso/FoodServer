@@ -16,6 +16,7 @@ from .serializers import *
 from .models import *
 import requests
 
+# API endpoints
 
 class Order(APIView):
     # REST API view where waiters handle orders. The waiter must be an authenticated user
@@ -214,6 +215,7 @@ class Supplier(APIView):
 
         return Response(resp)
 
+# Web pages (front-end)
 
 class ControlOrders(generic.ListView):
     # View that gives employees in the kitchen full control of the orders made by waiters
