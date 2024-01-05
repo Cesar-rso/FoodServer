@@ -8,7 +8,7 @@
             {% if order.status != 'PA' %}
                 <li><div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
                     <h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3>
-                    <input type='hidden' id='order_id' value="{{ order.id }}">
+                    <input type='hidden' class='order_id' value="{{ order.id }}">
 
             {% if user.is_authenticated %}
                 {% if order.status == 'CA' %}
@@ -65,8 +65,14 @@
         const csrftoken = getCookie('csrftoken');
         // const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // use this in case csrf_use_sessions = true 
         const user_username = JSON.parse(document.getElementById('user_username').textContent);
+        const order_doms = document.getElementsByClassName("order_id");
+        const order_ids = [];
 
         let last_order;
+
+        for (let o_dom of order_doms){
+            order_ids.push(o_dom.value);
+        }
 
         // check websocket connection
         const chatSocket = new WebSocket(
@@ -83,67 +89,68 @@
             let message = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
 
             if (count > 0 && order.id != last_order) {
-                const list_item = document.createElement('li');
-                let status_str;
-                switch(order.status){
-                    case "WA":
-                        status_str = "Waiting";
-                        break;
+                if(!order_ids.includes(order.id)){
+                    const list_item = document.createElement('li');
+                    let status_str;
+                    switch(order.status){
+                        case "WA":
+                            status_str = "Waiting";
+                            break;
 
-                    case "DE":
-                        status_str = "Delivered";
-                        break;
+                        case "DE":
+                            status_str = "Delivered";
+                            break;
 
-                    case "PD":
-                        status_str = "Partially Delivered";
-                        break;
+                        case "PD":
+                            status_str = "Partially Delivered";
+                            break;
 
-                    case "PP":
-                        status_str = "Preparing";
-                        break;
+                        case "PP":
+                            status_str = "Preparing";
+                            break;
 
-                    case "CA":
-                        status_str = "Canceled";
-                        break;
+                        case "CA":
+                            status_str = "Canceled";
+                            break;
 
-                    default:
-                        status_str = "Waiting";
-                        break;
+                        default:
+                            status_str = "Waiting";
+                            break;
 
-                }
-                list_item.innerHTML = `
-                <div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
-                <h3>Table: ${order.table} || Status: ${status_str}</h3>
-                <input type='hidden' id='order_id' value="${order.id}">
-                
-                <form method="post">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}" />
-                    <select name="status" id="status">
-                        <option value="WA">Waiting</option>
-                        <option value="DE">Delivered</option>
-                        <option value="PD">Partially Delivered</option>
-                        <option value="PP">Preparing</option>
-                        <option value="CA">Canceled</option>
-                    </select>
-                    <button name="submit" type="submit" value="${order.id}">Change Status</button>
-                </form>
-                </div>
-                
-            `;
-                console.log(order);
-                
-                for (let product of order.product){
-                    list_item.innerHTML += `<p> <b>-Item:</b> ${product.name} - $${product.price}</p>
+                    }
+                    list_item.innerHTML = `
+                    <div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
+                    <h3>Table: ${order.table} || Status: ${status_str}</h3>
+                    <input type='hidden' class='order_id' value="${order.id}">
                     
-                    `
+                    <form method="post">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}" />
+                        <select name="status" id="status">
+                            <option value="WA">Waiting</option>
+                            <option value="DE">Delivered</option>
+                            <option value="PD">Partially Delivered</option>
+                            <option value="PP">Preparing</option>
+                            <option value="CA">Canceled</option>
+                        </select>
+                        <button name="submit" type="submit" value="${order.id}">Change Status</button>
+                    </form>
+                    </div>
+                    
+                `;
+                    
+                    for (let product of order.product){
+                        list_item.innerHTML += `<p> <b>-Item:</b> ${product.name} - $${product.price}</p>
+                        
+                        `
+                    }
+                    document.getElementById('orders_list').appendChild(list_item);
+
+                    last_order = order.id;
+
+                    chatSocket.send(JSON.stringify({
+                            "message": message,
+                            "username": user_username }));
                 }
-                document.getElementById('orders_list').appendChild(list_item);
-
-                last_order = order.id;
-
-                chatSocket.send(JSON.stringify({
-                        "message": message,
-                        "username": user_username }));
             } else {
                 chatSocket.send(JSON.stringify({
                     "message": message,
