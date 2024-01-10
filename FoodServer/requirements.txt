@@ -1,7 +1,8 @@
-django = 4.2.2
-djangorestframework = 3.14.0
-Pillow = 9.5.0
-requests = 2.31.0
-channels = 4.0.0
+django == 4.2.2
+djangorestframework == 3.14.0
+Pillow == 9.5.0
+requests == 2.31.0
+channels == 4.0.0
 matplotlib
 daphne
+gunicorn
