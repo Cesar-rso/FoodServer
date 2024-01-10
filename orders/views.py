@@ -20,7 +20,7 @@ import requests
 
 class Order(APIView):
     # REST API view where waiters handle orders. The waiter must be an authenticated user
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     parser_classes = (JSONParser,)
 
     def get(self, request):
