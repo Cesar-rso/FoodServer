@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.views import generic
 from django.views.generic import CreateView
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -453,6 +454,7 @@ def login_request(request):
         username = request.POST['username']
         password = request.POST['password']
 
+        
         user = authenticate(username=username, password=password)
 
         if user is not None:
@@ -460,11 +462,32 @@ def login_request(request):
                 login(request, user)
                 return redirect('home')
         else:
-            context['message'] = "Invalid username or password."
-            return render(request, 'orders/error.html', context)
+            u = User.objects.get(username=username)
+        
+            if not u.has_usable_password():
+                context['message'] = "Define initial password."
+                context['username'] = username
+                return render(request, 'orders/newpass.html', context)
+                
+        context['message'] = "Invalid username or password."
+        return render(request, 'orders/error.html', context)
 
 
 def logout_request(request):
     # Basic logout method
     logout(request)
     return redirect('home')
+
+
+def initial_password(request):
+    context = {}
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        u = User.objects.get(username=username)
+        u.set_password(password)
+        u.save()
+
+        context['message'] = "Password successfully set!"
+        return render(request, 'orders/error.html', context)

@@ -1,0 +1,16 @@
+{% extends 'orders/base.html' %}
+{% block title %}Password Setup{% endblock %}
+{% block body %}
+  <br>
+  <h1>{{ message }}</h1>
+<div>
+  <form action="{% url 'initial_password' %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="username" value="{{ username }}">
+      <input type="password" class="form-control" name="password" value="">
+      <label for="password"></label>
+      <button name="Confirm" type="submit">Confirm</button>
+  </form>
+</div>
+
+{% endblock %}

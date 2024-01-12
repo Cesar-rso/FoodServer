@@ -15,5 +15,5 @@ RUN python manage.py migrate
 RUN python manage.py createsuperuser --username=admin --email=admin@foodserver.com --noinput
 # Change the default admin password once the system is running
 
-CMD [ "python", "manage.py", "runserver" ]
-# CMD ["gunicorn", "--bind=0.0.0.0:8000", "--workers=2", "FoodServer.wsgi"]
+# CMD [ "python", "manage.py", "runserver" ]
+CMD ["gunicorn", "--bind=0.0.0.0:8000", "--workers=2", "FoodServer.wsgi"]
