@@ -8,7 +8,9 @@
       {% csrf_token %}
       <input type="hidden" name="username" value="{{ username }}">
       <input type="password" class="form-control" name="password" value="">
-      <label for="password"></label>
+      <label for="password">Password</label>
+      <input type="password" class="form-control" name="confirm_pass" value="">
+      <label for="confirm_pass">Confirm password</label>
       <button name="Confirm" type="submit">Confirm</button>
   </form>
 </div>
