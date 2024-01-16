@@ -11,8 +11,26 @@
       <label for="password">Password</label>
       <input type="password" class="form-control" name="confirm_pass" value="">
       <label for="confirm_pass">Confirm password</label>
-      <button name="Confirm" type="submit">Confirm</button>
+      <button name="Confirm" type="submit" disabled>Confirm</button>
+      <p id="values"></p>
   </form>
 </div>
+<script>
+  const pass = document.getElementByName("password");
+  const confpass = document.getElementByName("confirm_pass");
+  const confbutton = document.getElementByName("Confirm");
+  const log = document.getElementById("values");
+
+  confpass.addEventListener("input", Confirmation);
+
+  function Confirmation(e){
+    if(e.target.value == pass.value){
+      confbutton.removeAttribute("disabled");
+    } else {
+      log.textContent = "Password doesn't match!";
+      confbutton.setAttribute("disabled", "");
+    }
+  }
+</script>
 
 {% endblock %}
