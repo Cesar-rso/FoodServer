@@ -1,0 +1,35 @@
+{% extends 'orders/base.html' %}
+{% block title %}New User{% endblock %}
+{% block body %}
+  <br>
+  <h1>New User</h1>
+<div>
+  <form action="{% url 'new_user' %}" method="post">
+      {% csrf_token %}
+      <input type="text" class="form-control" name="username" value="">
+      <label for="username">Username</label>
+      <input type="email" class="form-control" name="email" value="">
+      <label for="email">Email</label>
+      <button name="Confirm" type="submit" disabled>Confirm</button>
+      <p id="values"></p>
+  </form>
+</div>
+<script>
+  const user = document.getElementByName("username");
+  const email = document.getElementByName("email");
+  const confbutton = document.getElementByName("Confirm");
+  const log = document.getElementById("values");
+
+  email.addEventListener("input", Confirmation);
+
+  function Confirmation(e){
+    if(user.value != ""){
+      confbutton.removeAttribute("disabled");
+    } else {
+      log.textContent = "Username cannot be empty!";
+      confbutton.setAttribute("disabled", "");
+    }
+  }
+</script>
+
+{% endblock %}
