@@ -479,6 +479,21 @@ def logout_request(request):
     return redirect('home')
 
 
+def new_user(request):
+    context = {}
+    if request.method == 'GET':
+        return render(request, 'orders/newuser.html', context)
+    
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+
+        u = User.objects.create(username=username, email=email)
+        u.save()
+
+        return redirect('home')
+
+
 def initial_password(request):
     context = {}
     if request.method == 'POST':
