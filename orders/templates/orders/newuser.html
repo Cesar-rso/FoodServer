@@ -3,7 +3,7 @@
 {% block body %}
   <br>
   <h1>New User</h1>
-<div>
+<div style="width:50%">
   <form action="{% url 'new_user' %}" method="post">
       {% csrf_token %}
       <input type="text" class="form-control" name="username" value="">
@@ -15,9 +15,9 @@
   </form>
 </div>
 <script>
-  const user = document.getElementByName("username");
-  const email = document.getElementByName("email");
-  const confbutton = document.getElementByName("Confirm");
+  const user = document.getElementsByName("username")[0];
+  const email = document.getElementsByName("email")[0];
+  const confbutton = document.getElementsByName("Confirm")[0];
   const log = document.getElementById("values");
 
   email.addEventListener("input", Confirmation);

@@ -3,7 +3,7 @@
 {% block body %}
   <br>
   <h1>{{ message }}</h1>
-<div>
+<div style="width:50%">
   <form action="{% url 'initial_password' %}" method="post">
       {% csrf_token %}
       <input type="hidden" name="username" value="{{ username }}">
