@@ -7,25 +7,27 @@
   <form action="{% url 'initial_password' %}" method="post">
       {% csrf_token %}
       <input type="hidden" name="username" value="{{ username }}">
-      <input type="password" class="form-control" name="password" value="">
+      <input type="password" class="form-control" id="password_input" name="password" value="" required>
       <label for="password">Password</label>
-      <input type="password" class="form-control" name="confirm_pass" value="">
+      <input type="password" class="form-control" id="confirm_pass_input" name="confirm_pass" value="" required>
       <label for="confirm_pass">Confirm password</label>
-      <button name="Confirm" type="submit" disabled>Confirm</button>
-      <p id="values"></p>
+      <button id="Confirm" type="submit" disabled>Confirm</button>
+      <p id="values" style="color:red"></p>
   </form>
 </div>
 <script>
-  const pass = document.getElementByName("password");
-  const confpass = document.getElementByName("confirm_pass");
-  const confbutton = document.getElementByName("Confirm");
+  const pass = document.getElementById("password_input");
+  const confpass = document.getElementById("confirm_pass_input");
+  const confbutton = document.getElementById("Confirm");
   const log = document.getElementById("values");
 
   confpass.addEventListener("input", Confirmation);
 
   function Confirmation(e){
+    console.log(pass.value)
     if(e.target.value == pass.value){
       confbutton.removeAttribute("disabled");
+      log.textContent = "";
     } else {
       log.textContent = "Password doesn't match!";
       confbutton.setAttribute("disabled", "");

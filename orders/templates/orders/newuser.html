@@ -6,18 +6,18 @@
 <div style="width:50%">
   <form action="{% url 'new_user' %}" method="post">
       {% csrf_token %}
-      <input type="text" class="form-control" name="username" value="">
+      <input type="text" class="form-control" id="username_input" name="username" value="" required>
       <label for="username">Username</label>
-      <input type="email" class="form-control" name="email" value="">
+      <input type="email" class="form-control" id="email_input" name="email" value="">
       <label for="email">Email</label>
-      <button name="Confirm" type="submit" disabled>Confirm</button>
-      <p id="values"></p>
+      <button id="Confirm_button" name="Confirm" type="submit" disabled>Confirm</button>
+      <p id="values" style="color:red"></p>
   </form>
 </div>
 <script>
-  const user = document.getElementsByName("username")[0];
-  const email = document.getElementsByName("email")[0];
-  const confbutton = document.getElementsByName("Confirm")[0];
+  const user = document.getElementById("username_input");
+  const email = document.getElementById("email_input");
+  const confbutton = document.getElementById("Confirm_button");
   const log = document.getElementById("values");
 
   email.addEventListener("input", Confirmation);
@@ -25,6 +25,7 @@
   function Confirmation(e){
     if(user.value != ""){
       confbutton.removeAttribute("disabled");
+      log.textContent = "";
     } else {
       log.textContent = "Username cannot be empty!";
       confbutton.setAttribute("disabled", "");

@@ -454,23 +454,27 @@ def login_request(request):
         username = request.POST['username']
         password = request.POST['password']
 
-        
-        user = authenticate(username=username, password=password)
-
-        if user is not None:
-            if user.is_active:  # check if user account is not banned/blocked
-                login(request, user)
-                return redirect('home')
-        else:
+        try:
             u = User.objects.get(username=username)
+        except:       
+            context['message'] = "Invalid username."
+            return render(request, 'orders/error.html', context)
+            
+        if not u.has_usable_password():
+            context['message'] = "Define initial password."
+            context['username'] = username
+            return render(request, 'orders/newpass.html', context)
         
-            if not u.has_usable_password():
-                context['message'] = "Define initial password."
-                context['username'] = username
-                return render(request, 'orders/newpass.html', context)
+        else:
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                if user.is_active:  # check if user account is not banned/blocked
+                    login(request, user)
+                    return redirect('home')
                 
-        context['message'] = "Invalid username or password."
-        return render(request, 'orders/error.html', context)
+            context['message'] = "Invalid username or password."
+            return render(request, 'orders/error.html', context)
 
 
 def logout_request(request):
@@ -488,7 +492,7 @@ def new_user(request):
         username = request.POST['username']
         email = request.POST['email']
 
-        u = User.objects.create(username=username, email=email)
+        u = User.objects.create_user(username=username, email=email)
         u.save()
 
         return redirect('home')
