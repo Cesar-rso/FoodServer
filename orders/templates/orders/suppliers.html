@@ -35,6 +35,7 @@
                     <button name="submit" type="submit" value="{{ supplier.id }}">Delete Supplier</button>
                 </form>
             </div>
+            <div><a href="{% url 'update_supplier' pk=supplier.id %}"><h2 style="color:black"><pre> Update Supplier </pre></h2></a></div>
         </div>
     </li>
 {% endfor %}

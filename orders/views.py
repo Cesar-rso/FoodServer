@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -308,6 +308,16 @@ class ListSuppliers(generic.ListView):
 
         return render(request, 'order/suppliers.html', context)
     
+    def put(self, request):
+        supplier = Suppliers.objects.get(pk=request.POST['id'])
+        supplier.name = request.POST['name']
+        supplier.address = request.POST['address']
+        supplier.phone = request.POST['phone']
+        supplier.supply_type = request.POST['supply_type']
+        supplier.save()
+
+        return redirect('suppliers')
+    
     def delete(self, request):
         supplier = Suppliers.objects.get(pk=request.POST['submit'])
         supplier.delete()
@@ -327,6 +337,12 @@ class SupplierRegistration(CreateView):
     model = Suppliers
     fields = '__all__'
     template_name = "orders/supplier-form.html"
+
+
+class SupplierUpdate(UpdateView):
+    model = Suppliers
+    fields = '__all__'
+    template_name = "orders/supplier-update-form.html"
 
 
 def home(request):
@@ -494,6 +510,23 @@ def new_user(request):
 
         u = User.objects.create_user(username=username, email=email)
         u.save()
+
+        return redirect('home')
+    
+
+def delete_user(request):
+    context = {}
+    print(request.method)
+    if request.method == 'GET':
+        usr = User.objects.all()
+        context["users"] = usr
+
+        return render(request, 'orders/deleteuser.html', context)
+    
+    if request.method == 'POST':
+        print(request.POST['user_id'])
+        usr = User.objects.get(pk=request.POST['user_id'])
+        usr.delete()
 
         return redirect('home')
 
