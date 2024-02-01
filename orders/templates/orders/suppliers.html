@@ -32,10 +32,10 @@
             <div>
                 <form method="delete">
                         {% csrf_token %}
-                    <button name="submit" type="submit" value="{{ supplier.id }}">Delete Supplier</button>
+                    <button name="submit" type="submit" value="{{ supplier.id }}" style="position:relative; top:-130px; right:-800px;">Delete Supplier</button>
                 </form>
             </div>
-            <div><a href="{% url 'update_supplier' pk=supplier.id %}"><h2 style="color:black"><pre> Update Supplier </pre></h2></a></div>
+            <div><a href="{% url 'update_supplier' pk=supplier.id %}"><h2 style="color:black; width:30%;"><pre> Update Supplier </pre></h2></a></div>
         </div>
     </li>
 {% endfor %}

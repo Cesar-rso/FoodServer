@@ -23,7 +23,8 @@ urlpatterns = [path('', views.home, name='home'),
                path('suppliers', views.ListSuppliers.as_view(), name='suppliers'),
                path('new_product', views.ProductRegistration.as_view(), name='reg_product'),
                path('new_supplier', views.SupplierRegistration.as_view(), name='reg_supplier'),
-               path('update_supplier/<pk>', views.SupplierUpdate.as_view(), name="update_supplier")] \
+               path('update_supplier/<pk>', views.SupplierUpdate.as_view(), name="update_supplier"),
+               path('update_product/<pk>', views.ProductUpdate.as_view(), name="update_product")] \
               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

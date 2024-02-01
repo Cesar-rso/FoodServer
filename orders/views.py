@@ -345,6 +345,12 @@ class SupplierUpdate(UpdateView):
     template_name = "orders/supplier-update-form.html"
 
 
+class ProductUpdate(UpdateView):
+    model = Products
+    fields = '__all__'
+    template_name = "orders/product-update-form.html"
+
+
 def home(request):
     context = {}
     return render(request, "orders/index.html", context)
