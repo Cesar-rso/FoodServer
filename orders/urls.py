@@ -24,7 +24,8 @@ urlpatterns = [path('', views.home, name='home'),
                path('new_product', views.ProductRegistration.as_view(), name='reg_product'),
                path('new_supplier', views.SupplierRegistration.as_view(), name='reg_supplier'),
                path('update_supplier/<pk>', views.SupplierUpdate.as_view(), name="update_supplier"),
-               path('update_product/<pk>', views.ProductUpdate.as_view(), name="update_product")] \
+               path('update_product/<pk>', views.ProductUpdate.as_view(), name="update_product"),
+               path('update_user/<pk>', views.UserUpdate.as_view(), name="update_user")] \
               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

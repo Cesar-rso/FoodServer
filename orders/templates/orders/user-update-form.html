@@ -1,0 +1,25 @@
+{% extends 'orders/base.html' %}
+{% block title %}Update User{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12 col-md-7">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <h3>Update User</h3>
+          <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% include 'orders/form-template.html' %}
+            <div class="form-group">
+              <div class="col_sm_offset-2 col-sm-10">
+                <button class="btn btn-success" type="submit">Submit</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

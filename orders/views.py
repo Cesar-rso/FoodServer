@@ -351,6 +351,12 @@ class ProductUpdate(UpdateView):
     template_name = "orders/product-update-form.html"
 
 
+class UserUpdate(UpdateView):
+    model = User
+    fields = ['username', 'email', 'password']
+    template_name = "orders/user-update-form.html"
+
+
 def home(request):
     context = {}
     return render(request, "orders/index.html", context)

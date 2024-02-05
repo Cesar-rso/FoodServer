@@ -61,7 +61,7 @@
                 <button class="dropbtn">Users</button>
                 <div class="dropdown-content">
                     <a href="{% url 'new_user' %}"><h2> Register </h2></a>
-                    <a href="#"><h2> Change </h2></a>
+                    <a href="{% url 'update_user' pk=user.id %}"><h2> Update </h2></a>
                     <a href="{% url 'delete_user' %}"><h2> Delete </h2></a>
                 </div>
               </div> 
