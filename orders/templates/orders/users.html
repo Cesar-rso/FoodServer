@@ -1,0 +1,44 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Users{% endblock %}
+{% block body %}
+    <nav class="navbar navbar-default" style="background-color:Tomato">
+        <div class="container-fluid">
+            <h1>Users</h1>
+            <div class="navbar navbar-left">
+                <a href="{% url 'new_user' %}"><h2 style="color:black"><pre> Add User </pre></h2></a>
+            </div>
+            <form class="navbar-form navbar-right" role="search" method="post" name="search">
+                 {% csrf_token %}
+                <div class="form-group">
+                    <label for="sup_search"><h2>Search: </h2></label>
+                    <input type="text" id="sup_search" class="form-control" name="search" value="">
+                </div>
+                <button type="submit" class="btn btn-default">OK</button>
+            </form>
+        </div>
+    </nav>
+<ul style="list-style-type:none;">
+{% for usr in users %}
+    <li>
+        <div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
+        
+            <div>
+            <h2> - {{ usr.username }}</h2>
+            <h2>  {{ usr.email }}</h2><br>
+            
+            </div>
+            <br>
+            <div>
+                <form method="delete">
+                        {% csrf_token %}
+                    <button name="submit" type="submit" value="{{ usr.id }}" style="position:relative; top:-130px; right:-800px;">Delete User</button>
+                </form>
+            </div>
+            <div><a href="{% url 'update_user' pk=usr.id %}"><h2 style="color:black; width:30%;"><pre> Update Info </pre></h2></a></div>
+            <div><a href="#"><h2 style="color:black; width:30%;"><pre> Change Password </pre></h2></a></div>
+        </div>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

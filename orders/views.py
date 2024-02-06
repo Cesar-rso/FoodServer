@@ -323,6 +323,31 @@ class ListSuppliers(generic.ListView):
         supplier.delete()
 
         return redirect('suppliers')
+    
+
+class ListUsers(generic.ListView):
+    # View that lists all users, allowing deletion and inclusion of new ones.
+    template_name = "orders/users.html"
+    context_object_name = "users"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return User.objects.all().order_by('username')
+    
+    def post(self, request):
+        usr_id = request.POST['search']
+        if usr_id.isdecimal():
+            usr = User.objects.filter(pk=int(usr_id))
+        else:
+            usr = User.objects.filter(username=usr_id)
+        context = {'users': usr}
+
+        return render(request, 'orders/users.html', context)
+    
+    def delete(self, request):
+        usr = User.objects.get(pk=request.POST['submit'])
+        usr.delete()
+
+        return redirect('users')
 
 
 class ProductRegistration(CreateView):
@@ -353,7 +378,7 @@ class ProductUpdate(UpdateView):
 
 class UserUpdate(UpdateView):
     model = User
-    fields = ['username', 'email', 'password']
+    fields = ['username', 'email']
     template_name = "orders/user-update-form.html"
 
 

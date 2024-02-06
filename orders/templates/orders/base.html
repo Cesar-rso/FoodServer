@@ -58,6 +58,12 @@
         {% if user.is_superuser %}
         <div class="navbar navbar-left">
             <div class="dropdown">
+                <br>
+                <a href="{% url 'users' %}" class="dropbtn">Users</a>
+            </div> 
+        </div>
+       <!-- <div class="navbar navbar-left">
+            <div class="dropdown">
                 <button class="dropbtn">Users</button>
                 <div class="dropdown-content">
                     <a href="{% url 'new_user' %}"><h2> Register </h2></a>
@@ -65,7 +71,7 @@
                     <a href="{% url 'delete_user' %}"><h2> Delete </h2></a>
                 </div>
               </div> 
-        </div>
+        </div> -->
         {% endif %}
         <form class="navbar-form navbar-right" role="logout" method="post" action="logout">
              {% csrf_token %}
