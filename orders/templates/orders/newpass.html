@@ -4,7 +4,7 @@
   <br>
   <h1>{{ message }}</h1>
 <div style="width:50%">
-  <form action="{% url 'initial_password' %}" method="post">
+  <form action="{% url 'update_password' pk=0 %}" method="post">
       {% csrf_token %}
       <input type="hidden" name="username" value="{{ username }}">
       <input type="password" class="form-control" id="password_input" name="password" value="" required>

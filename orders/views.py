@@ -568,8 +568,13 @@ def delete_user(request):
         return redirect('home')
 
 
-def initial_password(request):
+def update_password(request, pk):
     context = {}
+    if request.method == "GET":
+        usr = User.objects.get(pk=pk)
+        context['username'] = usr.username
+        return render(request, 'orders/newpass.html', context)
+    
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']

@@ -36,7 +36,7 @@
                 </form>
             </div>
             <div><a href="{% url 'update_user' pk=usr.id %}"><h2 style="color:black; width:30%;"><pre> Update Info </pre></h2></a></div>
-            <div><a href="#"><h2 style="color:black; width:30%;"><pre> Change Password </pre></h2></a></div>
+            <div><a href="{% url 'update_password' pk=usr.id %}"><h2 style="color:black; width:30%;"><pre> Change Password </pre></h2></a></div>
         </div>
     </li>
 {% endfor %}
