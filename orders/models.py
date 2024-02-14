@@ -91,4 +91,8 @@ class Waiters(models.Model):
     )
 
 
-
+class Company(models.Model):
+    name = models.CharField(max_length=200, default='')
+    address = models.CharField(max_length=400, default='')
+    phone = models.IntegerField(default=0000000000)
+    logo = models.ImageField(upload_to='company/', default='default_logo.jpg')

@@ -62,17 +62,16 @@
                 <a href="{% url 'users' %}" class="dropbtn">Users</a>
             </div> 
         </div>
-       <!-- <div class="navbar navbar-left">
+        {% endif %}
+        <div class="navbar navbar-left">
             <div class="dropdown">
-                <button class="dropbtn">Users</button>
+                <button class="dropbtn">System</button>
                 <div class="dropdown-content">
-                    <a href="{% url 'new_user' %}"><h2> Register </h2></a>
-                    <a href="{% url 'update_user' pk=user.id %}"><h2> Update </h2></a>
-                    <a href="{% url 'delete_user' %}"><h2> Delete </h2></a>
+                    <a href="#"><h2> Company Info </h2></a>
+                    <a href="#"><h2> Configuration </h2></a>
                 </div>
               </div> 
-        </div> -->
-        {% endif %}
+        </div>
         <form class="navbar-form navbar-right" role="logout" method="post" action="logout">
              {% csrf_token %}
                 <div class="form-group">
