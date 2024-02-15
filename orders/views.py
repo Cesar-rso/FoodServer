@@ -585,3 +585,7 @@ def update_password(request, pk):
 
         context['message'] = "Password successfully set!"
         return render(request, 'orders/error.html', context)
+    
+
+def company_info(request):
+    pass

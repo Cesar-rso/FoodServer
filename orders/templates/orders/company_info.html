@@ -1,0 +1,17 @@
+{% extends 'orders/base.html' %}
+{% block title %}Company Info{% endblock %}
+{% block body %}
+  <br>
+  <h1>Company Info</h1>
+  <div>
+    <img src="company/{{ company.logo }}" alt="Company Logo" style="width:150px;height:180px;float:left;">
+    <h2>{{ company.name }}</h2>
+    <h3>{{ company.address }}</h3>
+    <h3>{{ company.phone }}</h3>
+    <br>
+    <form method="post">
+        <button>Update Info</button>
+    </form>
+  </div>
+
+{% endblock %}
