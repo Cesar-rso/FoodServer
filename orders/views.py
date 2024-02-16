@@ -561,7 +561,6 @@ def delete_user(request):
         return render(request, 'orders/deleteuser.html', context)
     
     if request.method == 'POST':
-        print(request.POST['user_id'])
         usr = User.objects.get(pk=request.POST['user_id'])
         usr.delete()
 
@@ -588,4 +587,9 @@ def update_password(request, pk):
     
 
 def company_info(request):
-    pass
+    context = {}
+    if request.method == "GET":
+        cmp = Company.objects.all()
+        context["company"] = cmp 
+        return render(request, 'orders/company_info.html', context)
+    
