@@ -9,9 +9,9 @@
     <h3>{{ company.address }}</h3>
     <h3>{{ company.phone }}</h3>
     <br>
-    <form method="post">
-        <button>Update Info</button>
-    </form>
+    {% if user.is_superuser %}
+        <a href="#">Update Info</a>
+    {% endif %}
   </div>
 
 {% endblock %}

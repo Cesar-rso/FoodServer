@@ -588,8 +588,18 @@ def update_password(request, pk):
 
 def company_info(request):
     context = {}
+    cmp = Company.objects.all()[0]
     if request.method == "GET":
-        cmp = Company.objects.all()
         context["company"] = cmp 
         return render(request, 'orders/company_info.html', context)
+    
+    if request.method == "POST":
+        cmp.name = request.POST['name']
+        cmp.address = request.POST['address']
+        cmp.phone = request.POST['phone']
+        cmp.logo = request.POST['logo']
+
+        cmp.save()
+
+        return redirect('info')
     
