@@ -10,7 +10,7 @@
     <h3>{{ company.phone }}</h3>
     <br>
     {% if user.is_superuser %}
-        <a href="#">Update Info</a>
+        <a href="{% url 'update_info' %}">Update Info</a>
     {% endif %}
   </div>
 

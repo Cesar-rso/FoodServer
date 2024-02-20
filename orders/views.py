@@ -382,6 +382,12 @@ class UserUpdate(UpdateView):
     template_name = "orders/user-update-form.html"
 
 
+class CompanyUpdate(UpdateView):
+    model = Company
+    fields = '__all__'
+    template_name = "orders/update-info-form.html"
+
+
 def home(request):
     context = {}
     return render(request, "orders/index.html", context)
@@ -592,14 +598,4 @@ def company_info(request):
     if request.method == "GET":
         context["company"] = cmp 
         return render(request, 'orders/company_info.html', context)
-    
-    if request.method == "POST":
-        cmp.name = request.POST['name']
-        cmp.address = request.POST['address']
-        cmp.phone = request.POST['phone']
-        cmp.logo = request.POST['logo']
-
-        cmp.save()
-
-        return redirect('info')
     
