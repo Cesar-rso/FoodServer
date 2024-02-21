@@ -2,6 +2,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
+from django.conf import settings
 from django.urls import reverse
 from django.views import generic
 from django.views.generic import CreateView, UpdateView
@@ -598,4 +599,10 @@ def company_info(request):
     if request.method == "GET":
         context["company"] = cmp 
         return render(request, 'orders/company_info.html', context)
+    
+
+def system_conf(request):
+    context = {}
+    if request.method == "GET":
+        return render(request, 'orders/system-conf.html', context)
     

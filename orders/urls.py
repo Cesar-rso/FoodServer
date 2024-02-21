@@ -28,7 +28,8 @@ urlpatterns = [path('', views.home, name='home'),
                path('update_product/<pk>', views.ProductUpdate.as_view(), name="update_product"),
                path('update_user/<pk>', views.UserUpdate.as_view(), name="update_user"),
                path('update_info', views.CompanyUpdate.as_view(), name="update_info"),
-               path('info', views.company_info,name="info")] \
+               path('info', views.company_info,name="info"),
+               path('config', views.system_conf, name="config")] \
               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
