@@ -8,8 +8,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'orders/style.css' %}" />
+    {% load i18n %}
 </head>
 <body>
+{% get_current_language as LANGUAGE_CODE %}
 <nav class="navbar navbar-default" style="background-color:Green">
     <div class="container-fluid">
 
@@ -28,19 +30,19 @@
         <div class="navbar navbar-left">
             <div class="dropdown">
                 <br>
-                <a href="{% url 'orders' %}" class="dropbtn">Orders</a>
+                <a href="{% url 'orders' %}" class="dropbtn">{% translate "Orders" %}</a>
             </div>
         </div>
         <div class="navbar navbar-left">
             <div class="dropdown">
                 <br>
-                <a href="{% url 'products' %}" class="dropbtn">Products</a>
+                <a href="{% url 'products' %}" class="dropbtn">{% translate "Products" %}</a>
             </div>
         </div>
         <div class="navbar navbar-left">
             <div class="dropdown">
                 <br>
-                <a href="{% url 'suppliers' %}" class="dropbtn">Suppliers</a>
+                <a href="{% url 'suppliers' %}" class="dropbtn">{% translate "Suppliers" %}</a>
             </div>
         </div>
         <div class="navbar navbar-left">
@@ -52,30 +54,30 @@
         <div class="navbar navbar-left">
             <div class="dropdown">
                 <br>
-                <a href="{% url 'reports' %}" class="dropbtn">Reports</a>
+                <a href="{% url 'reports' %}" class="dropbtn">{% translate "Reports" %}</a>
             </div> 
         </div>
         {% if user.is_superuser %}
         <div class="navbar navbar-left">
             <div class="dropdown">
                 <br>
-                <a href="{% url 'users' %}" class="dropbtn">Users</a>
+                <a href="{% url 'users' %}" class="dropbtn">{% translate "Users" %}</a>
             </div> 
         </div>
         {% endif %}
         <div class="navbar navbar-left">
             <div class="dropdown">
-                <button class="dropbtn">System</button>
+                <button class="dropbtn">{% translate "System" %}</button>
                 <div class="dropdown-content">
-                    <a href="{% url "info" %}"><h2> Company Info </h2></a>
-                    <a href="{% url "config" %}"><h2> Configuration </h2></a>
+                    <a href="{% url "info" %}"><h2> {% translate "Company Info" %} </h2></a>
+                    <a href="{% url "config" %}"><h2> {% translate "Configuration" %} </h2></a>
                 </div>
               </div> 
         </div>
         <form class="navbar-form navbar-right" role="logout" method="post" action="logout">
              {% csrf_token %}
                 <div class="form-group">
-                    <h2 style="color:white">Hello, {{ user.username }} </h2>
+                    <h2 style="color:white">{% blocktranslate %}Hello, {{ user.username }} {% endblocktranslate %}</h2>
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-default">Logout</button>
