@@ -1,8 +1,8 @@
 {% extends 'orders/base.html' %}
-{% block title %}Company Info{% endblock %}
+{% block title %}{% translate "Company Info" %}{% endblock %}
 {% block body %}
   <br>
-  <h1>Company Info</h1>
+  <h1>{% translate "Company Info" %}</h1>
   <div>
     <img src="company/{{ company.logo }}" alt="Company Logo" style="width:150px;height:180px;float:left;">
     <h2>{{ company.name }}</h2>
@@ -10,7 +10,7 @@
     <h3>{{ company.phone }}</h3>
     <br>
     {% if user.is_superuser %}
-        <a href="{% url 'update_info' %}">Update Info</a>
+        <a href="{% url 'update_info' %}">{% translate "Update Info" %}</a>
     {% endif %}
   </div>
 

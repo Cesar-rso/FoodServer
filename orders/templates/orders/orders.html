@@ -1,32 +1,32 @@
 {% extends 'orders/base.html' %}
-{% block title %}Orders{% endblock %}
+{% block title %}{% translate "Orders" %}{% endblock %}
 {% block body %}
-    <h1 style="background-color:Tomato;">Orders</h1>
+    <h1 style="background-color:Tomato;">{% translate "Orders" %}</h1>
     {% if all_orders %}
         <ul id="orders_list">
         {% for order in all_orders%}
             {% if order.status != 'PA' %}
                 <li><div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
-                    <h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3>
+                    <h3>{% translate "Table" %}: {{ order.table }} || Status: {{ order.get_status_display }}</h3>
                     <input type='hidden' class='order_id' value="{{ order.id }}">
 
             {% if user.is_authenticated %}
                 {% if order.status == 'CA' %}
                     <form method="delete">
                         {% csrf_token %}
-                    <button name="delete" type="submit" value="{{ order.id }}">Delete Order</button>
+                    <button name="delete" type="submit" value="{{ order.id }}">{% translate "Delete Order" %}</button>
                     </form>
                 {% endif %}
                     <form method="post">
                         {% csrf_token %}
                         <select name="status" id="status">
-                            <option value="WA">Waiting</option>
-                            <option value="DE">Delivered</option>
-                            <option value="PD">Partially Delivered</option>
-                            <option value="PP">Preparing</option>
-                            <option value="CA">Canceled</option>
+                            <option value="WA">{% translate "Waiting" %}</option>
+                            <option value="DE">{% translate "Delivered" %}</option>
+                            <option value="PD">{% translate "Partially Delivered" %}</option>
+                            <option value="PP">{% translate "Preparing" %}</option>
+                            <option value="CA">{% translate "Canceled" %}</option>
                         </select>
-                        <button name="submit" type="submit" value="{{ order.id }}">Change Status</button>
+                        <button name="submit" type="submit" value="{{ order.id }}">{% translate "Change" %} Status</button>
                     </form>
             {% endif %}
             </div>
@@ -40,7 +40,7 @@
         {% endfor %}
         </ul>
     {% else %}
-        <h1>No new Orders</h1>
+        <h1>{% translate "No new orders" %}</h1>
         <ul id="orders_list">
         </ul>
     {% endif %}

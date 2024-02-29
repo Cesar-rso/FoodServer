@@ -1,12 +1,12 @@
 {% extends 'orders/base.html' %}
-{% block title %}Delete User{% endblock %}
+{% block title %}{% translate "Delete User" %}{% endblock %}
 {% block body %}
   <br>
-  <h1>Delete User</h1>
+  <h1>{% translate "Delete User" %}</h1>
 <div style="width:50%">
   <form action="{% url 'delete_user' %}" method="post">
       {% csrf_token %}
-      <label for="user_id">Username</label>
+      <label for="user_id">{% translate "Username" %}</label>
       <select id="user_id_input" name="user_id" required>
         {% for usr in users %}
         <option value="{{ usr.id }}">{{ usr.username }}</option>
@@ -14,7 +14,7 @@
       </select>
       
       
-      <button id="Confirm_button" name="Confirm" type="submit">Confirm</button>
+      <button id="Confirm_button" name="Confirm" type="submit">{% translate "Confirm" %}</button>
   </form>
 </div>
 

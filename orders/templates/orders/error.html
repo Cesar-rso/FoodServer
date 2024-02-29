@@ -1,11 +1,11 @@
 {% extends 'orders/base.html' %}
-{% block title %}Error{% endblock %}
+{% block title %}{% translate "Error" %}{% endblock %}
 {% block body %}
   <br>
-  <h1>{{ message }}</h1>
+  <h1>{% blocktranslate %}{{ message }}{% endblocktranslate %}</h1>
   <form action="{% url 'home' %}" method="get">
       {% csrf_token %}
-      <button name="Back" type="submit">Back</button>
+      <button name="Back" type="submit">{% translate "Back" %}</button>
   </form>
 
 {% endblock %}
