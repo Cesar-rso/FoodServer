@@ -1,17 +1,17 @@
 {% extends 'orders/base.html' %}
 
-{% block title %}Suppliers{% endblock %}
+{% block title %}{% translate "Suppliers" %}{% endblock %}
 {% block body %}
     <nav class="navbar navbar-default" style="background-color:Tomato">
         <div class="container-fluid">
-            <h1>Suppliers</h1>
+            <h1>{% translate "Suppliers" %}</h1>
             <div class="navbar navbar-left">
-                <a href="{% url 'reg_supplier' %}"><h2 style="color:black"><pre> Add Supplier </pre></h2></a>
+                <a href="{% url 'reg_supplier' %}"><h2 style="color:black"><pre> {% translate "Add Supplier" %} </pre></h2></a>
             </div>
             <form class="navbar-form navbar-right" role="search" method="post" name="search">
                  {% csrf_token %}
                 <div class="form-group">
-                    <label for="sup_search"><h2>Search: </h2></label>
+                    <label for="sup_search"><h2>{% translate "Search" %}: </h2></label>
                     <input type="text" id="sup_search" class="form-control" name="search" value="">
                 </div>
                 <button type="submit" class="btn btn-default">OK</button>
@@ -26,16 +26,16 @@
             <div>
             <h2> - {{ supplier.name }}</h2>
             <h2>  {{ supplier.address }}</h2><br>
-            Phone: {{ supplier.phone }}
+            {% translate "Phone" %}: {{ supplier.phone }}
             </div>
             <br>
             <div>
                 <form method="delete">
                         {% csrf_token %}
-                    <button name="submit" type="submit" value="{{ supplier.id }}" style="position:relative; top:-130px; right:-800px;">Delete Supplier</button>
+                    <button name="submit" type="submit" value="{{ supplier.id }}" style="position:relative; top:-130px; right:-800px;">{% translate "Delete Supplier" %}</button>
                 </form>
             </div>
-            <div><a href="{% url 'update_supplier' pk=supplier.id %}"><h2 style="color:black; width:30%;"><pre> Update Supplier </pre></h2></a></div>
+            <div><a href="{% url 'update_supplier' pk=supplier.id %}"><h2 style="color:black; width:30%;"><pre> {% translate "Update Supplier" %} </pre></h2></a></div>
         </div>
     </li>
 {% endfor %}

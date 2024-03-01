@@ -1,10 +1,10 @@
 {% extends 'orders/base.html' %}
 
-{% block title %}Reports{% endblock %}
+{% block title %}{% translate "Reports" %}{% endblock %}
 {% block body %}
     <nav class="navbar navbar-default" style="background-color:Tomato">
         <div class="container-fluid">
-            <h1>Reports</h1>
+            <h1>{% translate "Reports" %}</h1>
         </div>
     </nav>
 <div>
@@ -13,21 +13,21 @@
         {% csrf_token %}
             <div class="form-group">
                 <select name="rep_type" id="rep_type">
-                    <option value="MS">Monthly Sales</option>
-                    <option value="SP">Sales/Product</option>
-                    <option value="ME">Monthly Expenses</option>
+                    <option value="MS">{% translate "Monthly Sales" %}</option>
+                    <option value="SP">{% translate "Sales per Product" %}</option>
+                    <option value="ME">{% translate "Monthly Expenses" %}</option>
                 </select>
-                <label for="rep_type">Report Type</label>
+                <label for="rep_type">{% translate "Report Type" %}</label>
             </div>
             <div class="form-group">
                 <input type="date" class="form-control" name="start_period" id="start_period" value="">
-                <label for="period">From: </label>
+                <label for="period">{% translate "From" %}: </label>
             </div>
             <div class="form-group">
                 <input type="date" class="form-control" name="end_period" id="end_period" value="">
-                <label for="period">To: </label>
+                <label for="period">{% translate "To" %}: </label>
             </div>
-            <button type="submit" class="btn btn-default">Generate Graph</button>
+            <button type="submit" class="btn btn-default">{% translate "Generate Graph" %}</button>
     </form>
 </div>
 {% endblock %}
