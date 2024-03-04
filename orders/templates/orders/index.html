@@ -1,8 +1,9 @@
 {% extends 'orders/base.html' %}
 {% block title %}Home{% endblock %}
 {% block body %}
+{% load i18n %}
 <h1 style="background-color:Tomato;">.</h1>
 <div style="margin: auto;">
-<p><h1 style="margin: auto; text-align: center; font-family: Lucida Handwriting, cursive;">Welcome to FoodServer</h1></p>
+<p><h1 style="margin: auto; text-align: center; font-family: Lucida Handwriting, cursive;">{% translate "Welcome to " %}FoodServer</h1></p>
 </div>
 {% endblock %}
