@@ -1,5 +1,6 @@
 {% extends 'orders/base.html' %}
-{% block title %}Password Setup{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Password Setup" %}{% endblock %}
 {% block body %}
   <br>
   <h1>{{ message }}</h1>
@@ -8,10 +9,10 @@
       {% csrf_token %}
       <input type="hidden" name="username" value="{{ username }}">
       <input type="password" class="form-control" id="password_input" name="password" value="" required>
-      <label for="password">Password</label>
+      <label for="password">{% translate "Password" %}</label>
       <input type="password" class="form-control" id="confirm_pass_input" name="confirm_pass" value="" required>
-      <label for="confirm_pass">Confirm password</label>
-      <button id="Confirm" type="submit" disabled>Confirm</button>
+      <label for="confirm_pass">{% translate "Confirm password" %}</label>
+      <button id="Confirm" type="submit" disabled>{% translate "Confirm" %}</button>
       <p id="values" style="color:red"></p>
   </form>
 </div>

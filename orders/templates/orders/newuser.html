@@ -1,16 +1,17 @@
 {% extends 'orders/base.html' %}
-{% block title %}New User{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "New User" %}{% endblock %}
 {% block body %}
   <br>
-  <h1>New User</h1>
+  <h1>{% translate "New User" %}</h1>
 <div style="width:50%">
   <form action="{% url 'new_user' %}" method="post">
       {% csrf_token %}
       <input type="text" class="form-control" id="username_input" name="username" value="" required>
-      <label for="username">Username</label>
+      <label for="username">{% translate "Username" %}</label>
       <input type="email" class="form-control" id="email_input" name="email" value="">
-      <label for="email">Email</label>
-      <button id="Confirm_button" name="Confirm" type="submit" disabled>Confirm</button>
+      <label for="email">{% translate "Email" %}</label>
+      <button id="Confirm_button" name="Confirm" type="submit" disabled>{% translate "Confirm" %}</button>
       <p id="values" style="color:red"></p>
   </form>
 </div>

@@ -1,4 +1,5 @@
 {% extends 'orders/base.html' %}
+{% load i18n %}
 
 {% block title %}Checkout{% endblock %}
 {% block body %}
@@ -7,11 +8,11 @@
         <div class="container-fluid">
             <form class="navbar-form navbar-right" role="search" method="post" name="search">
                  {% csrf_token %}
-                <h2>Table: </h2>
+                <h2>{% translate "Table" %}: </h2>
                 <div class="form-group">
                     <input type="text" class="form-control" name="search" value="">
                 </div>
-                <button type="submit" class="btn btn-default">Search</button>
+                <button type="submit" class="btn btn-default">{% translate "Search" %}</button>
             </form>
         </div>
     </nav>
@@ -19,7 +20,7 @@
     {% for order in orders %}
         <div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
         {% if order.status != 'PA' %}
-        <li><h3>Table: {{ order.table }} || Status: {{ order.get_status_display }}</h3></li>
+        <li><h3>{% translate "Table" %}: {{ order.table }} || Status: {{ order.get_status_display }}</h3></li>
         {% for product in order.product.all %}
             <p> <b>-Item:</b> {{ product.name }}</p>
         {% endfor %}
@@ -38,12 +39,12 @@
     <div class="container-fluid">
         <form method="post" name="pay" action="pay_orders">
             {% csrf_token %}
-            <button type="submit" class="btn btn-default" value="{{ table }}" name="pay">Confirm pay</button>
+            <button type="submit" class="btn btn-default" value="{{ table }}" name="pay">{% translate "Confirm pay" %}</button>
         </form>
     </div>
     {% else %}
     <div>
-        <h1>Log in to checkout orders</h1>
+        <h1>{% translate "Log in to pay orders" %}</h1>
     </div>
     {% endif %}
 </nav>

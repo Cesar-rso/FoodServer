@@ -1,21 +1,22 @@
 {% extends 'orders/base.html' %}
+{% load i18n %}
 
-{% block title %}New Order{% endblock %}
+{% block title %}{% translate "New Order" %}{% endblock %}
 {% block body %}
 <nav class="navbar navbar-default" style="background-color:Tomato">
     <div class="container-fluid">
-        <h1>New Order</h1>
+        <h1>{% translate "New Order" %}</h1>
     </div>
 </nav>
 </div>
 <form class="navbar-form navbar-left" method="post" name="neworder">
         {% csrf_token %}
         <div class="form-group">
-            <label for="table_number"><h2>Table: </h2></label>
+            <label for="table_number"><h2>{% translate "Table" %}: </h2></label>
             <input type="number" id="table_number" class="form-control" name="table_number" value="">
         </div>
         <div class="form-group">
-            <h2>Items: </h2>
+            <h2>{% translate "Items" %}: </h2>
             <div id="order_items" style="overflow:scroll; height:400px;" class="form-control" size=5 name="order_items">
                 {% for product in products %}
                 <input type="checkbox" id="{{ product.name }}" value={{ product.id }}>
