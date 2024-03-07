@@ -5,11 +5,14 @@
   <br>
   <h1>{% translate "Configurations" %}</h1>
   <div>
+    <form action="{% url 'config' %}" method="post">
     <select name="language" id="lang">
       <option value="en-us">English</option>
       <option value="pt-br">Português</option>
       <option value="es-es">Español</option>
     </select>
+    <button type="submit" class="btn btn-default">Confirm</button>
+  </form>
   </div>
 
 {% endblock %}

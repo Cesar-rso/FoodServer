@@ -17,6 +17,8 @@ from rest_framework.authtoken.models import Token
 from .serializers import *
 from .models import *
 import requests
+import json
+import os
 
 # API endpoints
 
@@ -603,6 +605,18 @@ def company_info(request):
 
 def system_conf(request):
     context = {}
+    arq = os.path.join(settings.STATIC_ROOT, 'config.json')
     if request.method == "GET":
+        with open(arq, "r") as arq_json:
+            config=json.load(arq_json)
+            context["language"] = config["language"]
         return render(request, 'orders/system-conf.html', context)
     
+    if request.method == "POST":
+        with open(arq, "rw") as arq_json:
+            config=json.load(arq_json)
+            config["language"] = request["language"]
+            context["language"] = config["language"]
+            arq_json.write(config)
+        
+        return render(request, 'orders/system-conf.html', context)
