@@ -6,6 +6,7 @@
   <h1>{% translate "Configurations" %}</h1>
   <div>
     <form action="{% url 'config' %}" method="post">
+      {% csrf_token %}
     <select name="language" id="lang">
       <option value="en-us">English</option>
       <option value="pt-br">Português</option>

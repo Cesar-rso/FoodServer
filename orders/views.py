@@ -605,18 +605,26 @@ def company_info(request):
 
 def system_conf(request):
     context = {}
-    arq = os.path.join(settings.STATIC_ROOT, 'config.json')
+    arq = os.path.join(settings.BASE_DIR, 'orders/static/config.json')
+    if not os.path.exists(arq):
+        with open(arq, "w") as arq_json:
+            arq_json.write(json.dumps({"language": "en-us"}))
+
     if request.method == "GET":
         with open(arq, "r") as arq_json:
-            config=json.load(arq_json)
-            context["language"] = config["language"]
+            if os.stat(arq).st_size != 0:
+                config=json.load(arq_json)
+                context["language"] = config["language"]
+            else:
+                context["language"] = "en-us"
         return render(request, 'orders/system-conf.html', context)
     
     if request.method == "POST":
-        with open(arq, "rw") as arq_json:
+        with open(arq, "r") as arq_json:
             config=json.load(arq_json)
-            config["language"] = request["language"]
+        with open(arq, "w") as arq_json:
+            config["language"] = request.POST["language"]
             context["language"] = config["language"]
-            arq_json.write(config)
+            arq_json.write(json.dumps(config))
         
         return render(request, 'orders/system-conf.html', context)
