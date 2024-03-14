@@ -597,7 +597,9 @@ def update_password(request, pk):
 
 def company_info(request):
     context = {}
-    cmp = Company.objects.all()[0]
+    cmp = Company.objects.all().first()
+    if cmp is None:
+        cmp = {"name":"Test Name", "address":"0000 Test Address", "phone":"00000000", "logo":"default_logo.jpg"}
     if request.method == "GET":
         context["company"] = cmp 
         return render(request, 'orders/company_info.html', context)
