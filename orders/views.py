@@ -597,11 +597,19 @@ def update_password(request, pk):
 
 def company_info(request):
     context = {}
-    cmp = Company.objects.all().first()
-    if cmp is None:
-        cmp = {"name":"Test Name", "address":"0000 Test Address", "phone":"00000000", "logo":"default_logo.jpg"}
+    arq = os.path.join(settings.BASE_DIR, 'orders/static/config.json')
+    cmp = {"name":"Test Name", "address":"0000 Test Address", "phone":"00000000", "logo":"default_logo.jpg", "language": "en-us"}
+
+    if not os.path.exists(arq):
+        with open(arq, "w") as arq_json:
+            arq_json.write(json.dumps(cmp))
     if request.method == "GET":
-        context["company"] = cmp 
+        with open(arq, "r") as arq_json:
+            if os.stat(arq).st_size != 0:
+                config=json.load(arq_json)
+                context["company"] = config
+            else:
+                context["company"] = cmp
         return render(request, 'orders/company_info.html', context)
     
 
@@ -609,8 +617,9 @@ def system_conf(request):
     context = {}
     arq = os.path.join(settings.BASE_DIR, 'orders/static/config.json')
     if not os.path.exists(arq):
+        cmp = {"name":"Test Name", "address":"0000 Test Address", "phone":"00000000", "logo":"default_logo.jpg", "language": "en-us"}
         with open(arq, "w") as arq_json:
-            arq_json.write(json.dumps({"language": "en-us"}))
+            arq_json.write(json.dumps(cmp))
 
     if request.method == "GET":
         with open(arq, "r") as arq_json:
