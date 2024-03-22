@@ -612,6 +612,17 @@ def company_info(request):
                 context["company"] = cmp
         return render(request, 'orders/company_info.html', context)
     
+    if request.method == "POST":
+        with open(arq, "w") as arq_json:
+            cmp["name"] = request.POST["name"]
+            cmp["address"] = request.POST["address"]
+            cmp["phone"] = request.POST["phone"]
+            cmp["logo"] = request.POST["logo"]
+            cmp["language"]= request.POST["language"]
+            arq_json.write(json.dumps(cmp))
+
+        return redirect("info")
+    
 
 def system_conf(request):
     context = {}
