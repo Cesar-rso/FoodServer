@@ -385,12 +385,6 @@ class UserUpdate(UpdateView):
     template_name = "orders/user-update-form.html"
 
 
-class CompanyUpdate(UpdateView):
-    model = Company
-    fields = '__all__'
-    template_name = "orders/update-info-form.html"
-
-
 def home(request):
     context = {}
     return render(request, "orders/index.html", context)
