@@ -7,15 +7,43 @@
   <div>
     <form method="post" action="{% url 'info' %}">
       <img src="company/{{ company.logo }}" alt="Company Logo" style="width:150px;height:180px;float:left;">
-      <input name="logo" type="image" disabled></input>
-      <input name="name" type="text" disabled>{{ company.name }}</input>
-      <input name="address" type="text" disabled>{{ company.address }}</input>
-      <input name="phone" type="tel" placeholder="12 34567-8910" pattern="[0-9]{2} [0-9]{5}-[0-9]{4}" disabled>{{ company.phone }}</input>
+      <input name="logo" id="logo" type="image" disabled></input>
+      <input name="name" id="name" type="text" disabled>{{ company.name }}</input>
+      <input name="address" id="address" type="text" disabled>{{ company.address }}</input>
+      <input name="phone" id="phone" type="tel" placeholder="12 34567-8910" pattern="[0-9]{2} [0-9]{5}-[0-9]{4}" disabled>{{ company.phone }}</input>
       <br>
     {% if user.is_superuser %}
-        <button type="submit" disabled>{% translate "Update Info" %}</button>
+        <button id="bt_confirm" type="submit" disabled>{% translate "Confirm Changes" %}</button>
+        <button name="bt_update" id="bt_update" onclick="UpdateInfo()">{% translate "Update Info" %}</button>
     {% endif %}
     </form>
   </div>
+
+  <script>
+    const logo = document.getElementById("logo");
+    const name = document.getElementById("name");
+    const address = document.getElementById("address");
+    const phone = document.getElementById("phone");
+    const conf = document.getElementById("bt_confirm");
+
+    phone.addEventListener("input", PhoneFormat);
+
+    function PhoneFormat(e){
+      if (phone.value.length == 2){
+        phone.value = phone.value + " "
+      }
+      if (phone.value.length == 8){
+        phone.value = phone.value + "-"
+      }
+    }
+
+    function UpdateInfo(){
+      logo.removeAttribute("disabled");
+      name.removeAttribute("disabled");
+      address.removeAttribute("disabled");
+      phone.removeAttribute("disabled");
+      conf.removeAttribute("disabled");
+    }
+  </script>
 
 {% endblock %}
