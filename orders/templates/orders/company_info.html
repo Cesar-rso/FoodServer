@@ -8,7 +8,7 @@
     <form method="post" action="{% url 'info' %}">
       {% csrf_token %}
       <img src="company/{{ company.logo }}" alt="Company Logo" style="width:150px;height:180px;float:left;">
-      <input name="logo" id="logo" type="image" disabled></input>
+      <input name="logo" id="logo" type="file" disabled></input>
       <br>
       <label for="name">{% translate "Name" %}....: </label>
       <input name="name" id="name" type="text" value="{{ company.name }}" disabled></input>
@@ -19,6 +19,7 @@
       <label for="phone">{% translate "Phone" %}...: </label>
       <input name="phone" id="phone" type="tel" placeholder="12 34567-8910" pattern="[0-9]{2} [0-9]{5}-[0-9]{4}" value="{{ company.phone }}" disabled></input>
       <br>
+      <input type="hidden" name="language" id="language" value="{{ company.language }}"></input>
     {% if user.is_superuser %}
         <button id="bt_confirm" type="submit" disabled>{% translate "Confirm Changes" %}</button>
     {% endif %}
