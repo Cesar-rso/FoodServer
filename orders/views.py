@@ -615,7 +615,7 @@ def company_info(request):
             cmp["language"]= request.POST["language"]
             arq_json.write(json.dumps(cmp))
 
-        img_file = os.path.join(settings.BASE_DIR, 'orders/static/'+request.POST["logo"])
+        img_file = os.path.join(settings.BASE_DIR, 'media/'+request.POST["logo"])
         with open(img_file, "w") as logo:
             logo.write(request.FILES["logo"])
 

@@ -7,8 +7,7 @@
   <div>
     <form enctype="multipart/form-data" method="post" action="{% url 'info' %}">
       {% csrf_token %}
-      {% load static %}
-      <img src="{% static 'orders/default_logo.png' %}" alt="Company Logo" style="width:150px;height:180px;float:left;">
+      <img src="media/{{ company.logo }}" alt="Company Logo" style="width:150px;height:180px;float:left;">
       <input name="logo" id="logo" type="file" disabled></input>
       <br>
       <label for="name">{% translate "Name" %}....: </label>
