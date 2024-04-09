@@ -385,16 +385,32 @@ class UserUpdate(UpdateView):
     template_name = "orders/user-update-form.html"
 
 
-def home(request):
+def read_config():
+    arq = os.path.join(settings.BASE_DIR, 'orders/static/config.json')
     context = {}
+    if not os.path.exists(arq):
+        cmp = {"name":"Test Name", "address":"0000 Test Address", "phone":"00000000", "logo":"default_logo.jpg", "language": "en-us"}
+        with open(arq, "r") as arq_json:
+            config=json.load(arq_json)
+            context["language"] = config["language"]
+            context["logo"] = config["logo"]
+
+    return context
+
+
+def home(request):
+    context = read_config()
     return render(request, "orders/index.html", context)
 
 
 def new_order(request):
     # View for making new orders from the browser
+    config = read_config()
     if request.method == "GET":
         products = Products.objects.all()
         context = {"products": products}
+        context["language"] = config["language"]
+        context["logo"] = config["logo"]
         return render(request, "orders/neworder.html", context)
     
     if request.method == "POST":
@@ -434,7 +450,7 @@ def pay_orders(request):
 
 def reports(request):
     # View for generating graphs, like sales and expenses graphs
-    context = {}
+    context = read_config()
     context["plot"] = ""
 
     if request.method == "POST":
@@ -540,7 +556,7 @@ def logout_request(request):
 
 
 def new_user(request):
-    context = {}
+    context = read_config()
     if request.method == 'GET':
         return render(request, 'orders/newuser.html', context)
     
@@ -555,7 +571,7 @@ def new_user(request):
     
 
 def delete_user(request):
-    context = {}
+    context = read_config()
     print(request.method)
     if request.method == 'GET':
         usr = User.objects.all()
@@ -571,7 +587,7 @@ def delete_user(request):
 
 
 def update_password(request, pk):
-    context = {}
+    context = read_config()
     if request.method == "GET":
         usr = User.objects.get(pk=pk)
         context['username'] = usr.username
