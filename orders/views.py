@@ -390,6 +390,11 @@ def read_config():
     context = {}
     if not os.path.exists(arq):
         cmp = {"name":"Test Name", "address":"0000 Test Address", "phone":"00000000", "logo":"default_logo.jpg", "language": "en-us"}
+        with open(arq, "w") as arq_json:
+            arq_json.write(json.dumps(cmp))
+        context["language"] = cmp["language"]
+        context["logo"] = cmp["logo"]
+    else:
         with open(arq, "r") as arq_json:
             config=json.load(arq_json)
             context["language"] = config["language"]
