@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
+from datetime import datetime
 from .serializers import *
 from .models import *
 import requests
@@ -397,6 +398,8 @@ def read_config():
     else:
         with open(arq, "r") as arq_json:
             config=json.load(arq_json)
+            if len(config) == 0:
+                config = {"name":"Test Name", "address":"0000 Test Address", "phone":"00000000", "logo":"default_logo.jpg", "language": "en-us"}
             context["language"] = config["language"]
             context["logo"] = config["logo"]
 
@@ -628,17 +631,19 @@ def company_info(request):
         return render(request, 'orders/company_info.html', context)
     
     if request.method == "POST":
+        logo_file = "logo" + str(datetime.date.today().year) + str(datetime.date.today().month) + str(datetime.date.today().day) + ".jpg"
         with open(arq, "w") as arq_json:
             cmp["name"] = request.POST["name"]
             cmp["address"] = request.POST["address"]
             cmp["phone"] = request.POST["phone"]
-            cmp["logo"] = request.POST["logo"]
+            cmp["logo"] = logo_file
             cmp["language"]= request.POST["language"]
             arq_json.write(json.dumps(cmp))
 
-        img_file = os.path.join(settings.BASE_DIR, 'media/'+request.POST["logo"])
-        with open(img_file, "w") as logo:
-            logo.write(request.FILES["logo"])
+        img_file = os.path.join(settings.BASE_DIR, 'media/'+logo_file)
+
+        with open(img_file, "wb") as logo:
+            logo.write(request.FILES.get("logo").file.read())
 
         return redirect("info")
     

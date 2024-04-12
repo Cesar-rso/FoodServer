@@ -21,7 +21,7 @@
       <br>
       <input type="hidden" name="language" id="language" value="{{ company.language }}"></input>
     {% if user.is_superuser %}
-        <button id="bt_confirm" type="submit" disabled>{% translate "Confirm Changes" %}</button>
+        <button id="bt_confirm" type="submit" style="display: none">{% translate "Confirm Changes" %}</button>
     {% endif %}
     </form>
     {% if user.is_superuser %}
@@ -35,6 +35,7 @@
     const address = document.getElementById("address");
     const phone = document.getElementById("phone");
     const conf = document.getElementById("bt_confirm");
+    const updt = document.getElementById("bt_update");
 
     phone.addEventListener("input", PhoneFormat);
 
@@ -52,7 +53,9 @@
       name.removeAttribute("disabled");
       address.removeAttribute("disabled");
       phone.removeAttribute("disabled");
-      conf.removeAttribute("disabled");
+      conf.removeAttribute("style");
+
+      updt.style.display = 'none';
     }
   </script>
 
