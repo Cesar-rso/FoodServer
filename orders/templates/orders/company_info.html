@@ -17,7 +17,7 @@
       <input name="address" id="address" type="text" value="{{ company.address }}" disabled></input>
       <br>
       <label for="phone">{% translate "Phone" %}...: </label>
-      <input name="phone" id="phone" type="tel" placeholder="12 34567-8910" pattern="[0-9]{2} [0-9]{5}-[0-9]{4}" value="{{ company.phone }}" disabled></input>
+      <input name="phone" id="phone" type="tel" placeholder="12 34567-8910" pattern="[0-9]{2} [0-9]{4,5}-[0-9]{4}" value="{{ company.phone }}" disabled></input>
       <br>
       <input type="hidden" name="language" id="language" value="{{ company.language }}"></input>
     {% if user.is_superuser %}
@@ -43,8 +43,14 @@
       if (phone.value.length == 2){
         phone.value = phone.value + " "
       }
-      if (phone.value.length == 8){
-        phone.value = phone.value + "-"
+      if (phone.value[3] == "9"){
+        if (phone.value.length == 8){
+          phone.value = phone.value + "-"
+        }
+      }else{
+        if (phone.value.length == 7){
+          phone.value = phone.value + "-"
+        }
       }
     }
 
