@@ -2,6 +2,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
+from django.utils import translation
 from django.conf import settings
 from django.urls import reverse
 from django.views import generic
@@ -228,6 +229,7 @@ class ControlOrders(generic.ListView):
     context_object_name = 'all_orders'
 
     def get_queryset(self):
+        context = read_config()
         return Orders.objects.all().order_by('date')
 
     def post(self, request):
@@ -251,6 +253,7 @@ class Checkout(generic.ListView):
     context_object_name = 'orders'
 
     def get_queryset(self):
+        context = read_config()
         return Orders.objects.all().order_by('date')
 
     def post(self, request):
@@ -274,6 +277,7 @@ class ListProducts (generic.ListView):
     context_object_name = "products"
 
     def get_queryset(self):
+        context = read_config()
         return Products.objects.all().order_by('name')
 
     def post(self, request):
@@ -300,6 +304,7 @@ class ListSuppliers(generic.ListView):
     context_object_name = "suppliers"
 
     def get_queryset(self) -> QuerySet[Any]:
+        context = read_config()
         return Suppliers.objects.all().order_by('name')
     
     def post(self, request):
@@ -335,6 +340,7 @@ class ListUsers(generic.ListView):
     context_object_name = "users"
 
     def get_queryset(self) -> QuerySet[Any]:
+        context = read_config()
         return User.objects.all().order_by('username')
     
     def post(self, request):
@@ -403,6 +409,7 @@ def read_config():
             context["language"] = config["language"]
             context["logo"] = config["logo"]
 
+    translation.activate(context["language"])
     return context
 
 
@@ -659,5 +666,7 @@ def system_conf(request):
             config["language"] = request.POST["language"]
             context["language"] = config["language"]
             arq_json.write(json.dumps(config))
+
+        translation.activate(context["language"])
         
         return render(request, 'orders/system-conf.html', context)
