@@ -90,3 +90,15 @@ class Waiters(models.Model):
         on_delete=models.CASCADE,
     )
 
+
+class Messages(models.Model):
+    _from = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    _to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    date = models.DateTimeField(default=datetime.datetime.now)
+    message = models.CharField(max_length=800)
