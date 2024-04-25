@@ -220,6 +220,50 @@ class Supplier(APIView):
             resp = {"status": f"{e}"}
 
         return Response(resp)
+    
+
+class Message(APIView):
+    # REST API view to handle user messages
+    permission_classes = (IsAuthenticated,)
+    parser_classes = (JSONParser,)
+
+    def get(self, request):
+        data = request.GET
+
+        if "message_id" in data.keys():
+            messages = Messages.objects.get(id=data["message_id"])
+                     
+        elif "sender" in data.keys():
+            messages = Messages.objects.get(sender=data["sender"])
+
+        else:
+            messages = Messages.objects.all()
+
+        serializer = MessageSerializer(messages)
+        resp = serializer.data
+
+        return Response(resp)
+        
+
+    def post(self, request):
+        data = request.data
+
+        message = Messages(sender=data["sender"], receiver=data["receiver"], date='', message=data["message"])
+        message.save()
+
+        resp = {"status": "Message sent!"}
+
+        return Response(resp)
+
+    def delete(self, request):
+        data = request.data
+
+        message = Messages.objects.get(id=data["message_id"])
+        message.delete()
+
+        resp = {"status": "Message deleted!"}
+        return Response(resp)
+
 
 # Web pages (front-end)
 

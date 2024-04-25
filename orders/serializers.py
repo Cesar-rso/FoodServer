@@ -22,3 +22,10 @@ class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Suppliers
         fields = '__all__'
+
+
+class MessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Messages
+        fields = '__all__'
