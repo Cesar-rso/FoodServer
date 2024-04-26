@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Order, Products, Payments
 from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder, CheckOrder, \
-    PlaceOrder
+    PlaceOrder, Message
 
 
 class CheckProductAPITest(APITestCase):
@@ -298,6 +298,52 @@ class ProductsTestCase(TestCase):
         products = Products.objects.all().count()
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(products, 0)
+
+
+class MessagesTestCase(TestCase):
+
+    def setUp(self) -> None:
+        self.user = User.objects.create(username='test')
+        self.user.set_password('passtest')
+        self.user.save()
+
+        self.user = User.objects.create(username='test2')
+        self.user.set_password('passtest2')
+        self.user.save()
+
+    def test_url(self):
+        url = reverse('api-message')
+        self.assertEqual(resolve(url).func.view_class, Message)
+
+    def test_getAllMessages(self):
+        pass
+
+    def test_getMessagesFromUser(self):
+        pass
+
+    def test_getSpecificMessage(self):
+        pass
+
+    def test_postNewMessage(self):
+        pass
+
+    def test_deleteMessage(self):
+        pass
+
+    def test_getSpecificMessageWrongId(self):
+        pass
+
+    def test_getMessagesFromInexistentUser(self):
+        pass
+
+    def test_postNewMessageWithInexistentSender(self):
+        pass
+
+    def test_postNewMessageWithInexistentReceiver(self):
+        pass
+
+    def test_DeleteMessageWrongId(self):
+        pass
 
 
 class LoginTestCase(TestCase):
