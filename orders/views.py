@@ -247,8 +247,8 @@ class Message(APIView):
 
     def post(self, request):
         data = request.data
-
-        message = Messages(sender=data["sender"], receiver=data["receiver"], date='', message=data["message"])
+        
+        message = Messages(sender=data["sender"], receiver=data["receiver"], date=data["date"], message=data["message"])
         message.save()
 
         resp = {"status": "Message sent!"}

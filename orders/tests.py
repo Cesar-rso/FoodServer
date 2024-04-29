@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Order, Products, Payments
+from .models import Order, Products, Payments, Messages
 from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder, CheckOrder, \
     PlaceOrder, Message
 
@@ -315,16 +315,22 @@ class MessagesTestCase(TestCase):
         url = reverse('api-message')
         self.assertEqual(resolve(url).func.view_class, Message)
 
+    def test_postNewMessage(self):
+        response = self.client.post(reverse('api-message'), {'sender': 1, 'receiver': 2, 'date': "2024-04-22", "message": "test message 1"})
+        message = Messages.objects.get(id=1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(message.message, "test message 1")
+
     def test_getAllMessages(self):
-        pass
+        response = self.client.get(reverse('api-message'))
+        message = Messages.objects.all()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(message.count(), 1)
 
     def test_getMessagesFromUser(self):
         pass
 
     def test_getSpecificMessage(self):
-        pass
-
-    def test_postNewMessage(self):
         pass
 
     def test_deleteMessage(self):
