@@ -323,12 +323,19 @@ class MessagesTestCase(TestCase):
 
     def test_getAllMessages(self):
         response = self.client.get(reverse('api-message'))
-        message = Messages.objects.all()
+        messages = Messages.objects.all()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(message.count(), 1)
+        self.assertEqual(messages.count(), 1)
 
     def test_getMessagesFromUser(self):
-        pass
+        response = self.client.get(reverse('api-message'), sender="1")
+        messages = Messages.objects.get(sender=1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(messages.count(), 1)
+        for msg in response.data:
+            self.assertEqual(msg.sender, 1)
+            self.assertEqual(msg.receiver, 2)
+            self.assertEqual(msg.message, "test message 1")
 
     def test_getSpecificMessage(self):
         pass
