@@ -300,7 +300,7 @@ class ProductsTestCase(TestCase):
         self.assertEqual(products, 0)
 
 
-class MessagesTestCase(TestCase):
+class MessagesAPITest(APITestCase):
 
     def setUp(self) -> None:
         self.user = User.objects.create(username='test')
@@ -338,10 +338,11 @@ class MessagesTestCase(TestCase):
             self.assertEqual(msg.message, "test message 1")
 
     def test_getSpecificMessage(self):
-        pass
-
-    def test_deleteMessage(self):
-        pass
+        response = self.client.get(reverse('api-message'), message_id="1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.sender, 1)
+        self.assertEqual(response.data.receiver, 2)
+        self.assertEqual(response.data.message, "test message 1")
 
     def test_getSpecificMessageWrongId(self):
         pass
@@ -358,6 +359,11 @@ class MessagesTestCase(TestCase):
     def test_DeleteMessageWrongId(self):
         pass
 
+    def test_DeleteMessage(self):
+        response = self.client.delete(reverse('api-message'), message_id="1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        messages = Messages.objects.all()
+        self.assertEqual(messages.count(), 0)
 
 class LoginTestCase(TestCase):
 
