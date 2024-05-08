@@ -345,7 +345,9 @@ class MessagesAPITest(APITestCase):
         self.assertEqual(response.data.message, "test message 1")
 
     def test_getSpecificMessageWrongId(self):
-        pass
+        response = self.client.get(reverse('api-message'), message_id="4")
+        print(response.status_code)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_getMessagesFromInexistentUser(self):
         pass
