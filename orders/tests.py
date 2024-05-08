@@ -350,7 +350,9 @@ class MessagesAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_getMessagesFromInexistentUser(self):
-        pass
+        response = self.client.get(reverse('api-message'), sender="4")
+        print(response.status_code)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_postNewMessageWithInexistentSender(self):
         pass
@@ -359,7 +361,8 @@ class MessagesAPITest(APITestCase):
         pass
 
     def test_DeleteMessageWrongId(self):
-        pass
+        response = self.client.delete(reverse('api-message'), message_id="7")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_DeleteMessage(self):
         response = self.client.delete(reverse('api-message'), message_id="1")
