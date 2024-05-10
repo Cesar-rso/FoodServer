@@ -4,18 +4,18 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Order, Products, Payments, Messages
-from .views import ControlOrders, login_request, Checkout, ListProducts, CheckProduct, CancelOrder, CheckOrder, \
-    PlaceOrder, Message
+from .models import Orders, Products, Payments, Messages, Suppliers
+from .views import ControlOrders, login_request, Checkout, ListProducts, Product, Order, Message
 
 
-class CheckProductAPITest(APITestCase):
+class ProductAPITest(APITestCase):
     def setUp(self):
-        Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
+        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
+        Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
 
     def test_url(self):  # Verifying if the correct url resolves
         url = reverse('check-product')
-        self.assertEqual(resolve(url).func.view_class, CheckProduct)
+        self.assertEqual(resolve(url).func.view_class, Product)
 
     def test_correctID(self):
         product = Products.objects.all().first()
@@ -23,8 +23,8 @@ class CheckProductAPITest(APITestCase):
         url = reverse('check-product')
 
         response = self.client.get(url, search)
-        product_data = {"id": 1, "name": "testProduct", "description": "-test-", "price": 2.56,
-                                         "picture": "/media/default.jpg"}
+        product_data = {"id": 1, "name": "testProduct", "description": "-test-", "price": 2.56, "cost": 1.80,
+                                         "picture": "/media/default.jpg", "supplier": 1}
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, product_data)
@@ -40,12 +40,15 @@ class CheckProductAPITest(APITestCase):
         self.assertEqual(response.data, product_data)
 
 
-class CancelOrderAPITest(APITestCase):
+class OrderAPITest(APITestCase):
 
     def setUp(self):
-        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
+        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
+        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
         test_product.save()
-        test_order = Order.objects.create(table=1, status='WA')
+        test_product2 = Products.objects.create(id=2, name='testProduct2', description='-test2-', price=3.88, cost=2.80, supplier=sup)
+        test_product2.save()
+        test_order = Orders.objects.create(table=1, status='WA')
         test_order.save()
         test_order.product.add(test_product)
 
@@ -57,13 +60,13 @@ class CancelOrderAPITest(APITestCase):
         Token.objects.create(user=self.user)
 
     def test_url(self):
-        url = reverse('cancel-order')
-        self.assertEqual(resolve(url).func.view_class, CancelOrder)
+        url = reverse('api-orders')
+        self.assertEqual(resolve(url).func.view_class, Order)
 
     def test_CancelWithNoCredentials(self):
         data = {"table": 1}
 
-        response = self.client.post(reverse('cancel-order'), data=data, format="json")
+        response = self.client.delete(reverse('api-orders'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_CancelWithCredentials(self):
@@ -75,11 +78,11 @@ class CancelOrderAPITest(APITestCase):
 
         data = {"table": 1}
 
-        response = self.client.post(reverse('cancel-order'), data=data, format="json")
-        order = Order.objects.filter(table=1).order_by('date')[0]
+        response = self.client.delete(reverse('api-orders'), data=data, format="json")
+        order = Orders.objects.filter(table=1).order_by('date')[0]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(order.status, Order.Status.CANCELED)
+        self.assertEqual(order.status, Orders.Status.CANCELED)
 
     def test_CancelWithWrongData(self):
         check_login = self.client.login(username='test', password='passtest')
@@ -90,65 +93,42 @@ class CancelOrderAPITest(APITestCase):
 
         data = {"table": 5}
 
-        response = self.client.post(reverse('cancel-order'), data=data, format="json")
-        order = Order.objects.filter(table=1).order_by('date')[0]
-        rt_data = {"exception": "Couldn't find requested product!"}
+        response = self.client.delete(reverse('api-orders'), data=data, format="json")
+        order = Orders.objects.filter(table=1).order_by('date')[0]
+        rt_data = {"exception": "Couldn't find requested order!"}
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(order.status, Order.Status.WAITING)
+        self.assertEqual(order.status, Orders.Status.WAITING)
         self.assertEqual(response.data, rt_data)
 
-
-class CheckOrderAPITest(APITestCase):
-
-    def setUp(self):
-        user = User.objects.create(username='test')
-        user.set_password('passtest')
-        user.save()
-        Payments.objects.create(value=0.0, user=user)
-        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
-        test_product.save()
-        test_order = Order.objects.create(table=1, status='WA')
-        test_order.save()
-        test_order.product.add(test_product)
-
-    def test_url(self):  # Verifying if the correct url resolves
-        url = reverse('check-order')
-        self.assertEqual(resolve(url).func.view_class, CheckOrder)
-
     def testCheckOrderWithExistingTable(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
         data = {"table": 1}
-        response = self.client.get(reverse("check-order"), data)
+        response = self.client.get(reverse("api-orders"), data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # print(response.data)
 
     def testCheckOrderWithWrongTableNumber(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
         data = {"table": 5}
         resp = {"exception": "Couldn't find requested order!"}
-        response = self.client.get(reverse("check-order"), data)
+        response = self.client.get(reverse("api-orders"), data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, resp)
 
-
-class PlaceOrdersAPITest(APITestCase):
-
-    def setUp(self):
-        self.user = User.objects.create(username='test')
-        self.user.set_password('passtest')
-        self.user.save()
-        Payments.objects.create(value=0.0, user=self.user)
-        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56)
-        test_product.save()
-        test_product2 = Products.objects.create(id=2, name='testProduct2', description='-test2-', price=3.88)
-        test_product2.save()
-
-    def test_url(self):  # Verifying if the correct url resolves
-        url = reverse('place-order')
-        self.assertEqual(resolve(url).func.view_class, PlaceOrder)
-
     def testPlaceOrderWithCorrectDataNoToken(self):
         data = {"products": {"product1": 1, "product2": 2}, "table": 1, "status": "WA"}
-        response = self.client.post(reverse("place-order"), data, format="json")
+        response = self.client.post(reverse("api-orders"), data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -160,12 +140,12 @@ class PlaceOrdersAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         data = {"products": {"product1": 1, "product2": 2}, "table": 1, "status": "WA"}
-        response = self.client.post(reverse("place-order"), data, format="json")
+        response = self.client.post(reverse("api-orders"), data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"], "Order placed!")
 
-        order = Order.objects.all().first()
+        order = Orders.objects.get(id=2)
         self.assertEqual(order.status, "WA")
         self.assertEqual(order.table, 1)
         pk_counter = 1
@@ -189,7 +169,7 @@ class PlaceOrdersAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         data = {"products": {"product1": 3}, "table": 1, "status": "WA"}
-        response = self.client.post(reverse("place-order"), data, format="json")
+        response = self.client.post(reverse("api-orders"), data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"], "Error! Could not find product!")
@@ -201,9 +181,10 @@ class OrdersTestCase(TestCase):
         user.set_password('passtest')
         user.save()
         Payments.objects.create(value=0.0, user=user)
-        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56)
+        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
+        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
         test_product.save()
-        test_order = Order.objects.create(table=1, status='WA')
+        test_order = Orders.objects.create(table=1, status='WA')
         test_order.save()
         test_order.product.add(test_product)
 
@@ -214,20 +195,20 @@ class OrdersTestCase(TestCase):
     def test_OrdersGET(self):
         response = self.client.get(reverse('orders'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTemplateUsed(response, 'orders/index.html')
+        self.assertTemplateUsed(response, 'orders/orders.html')
 
     def test_OrdersPOST(self):
         response = self.client.post(reverse('orders'), {'submit': 1, 'status': 'PP'})
-        current_status = Order.objects.get(pk=1).status
+        current_status = Orders.objects.get(pk=1).status
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(current_status, 'PP')
 
     def test_OrdersDELETE(self):
-        order_to_delete = Order.objects.all().first().pk
+        order_to_delete = Orders.objects.all().first().pk
         response = self.client.post(reverse('orders'), {'delete': order_to_delete, 'status': 'PP'})
-        orders = Order.objects.all()
+        orders = Orders.objects.all()
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        self.assertEqual(orders.count(), 0)
+        self.assertEqual(orders.count(), 1)
 
 
 class CheckoutTestCase(TestCase):
@@ -236,9 +217,10 @@ class CheckoutTestCase(TestCase):
         user.set_password('passtest')
         user.save()
         Payments.objects.create(value=0.0, user=user)
-        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56)
+        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
+        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
         test_product.save()
-        test_order = Order.objects.create(table=1, status='WA')
+        test_order = Orders.objects.create(table=1, status='WA')
         test_order.save()
         test_order.product.add(test_product)
 
@@ -262,20 +244,21 @@ class CheckoutTestCase(TestCase):
     def test_CheckoutPOST_SQL_injection(self):
         response = self.client.post(reverse('checkout'), {'search': '\'); DELETE * FROM Order;'})
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        orders = Order.objects.all()
+        orders = Orders.objects.all()
         self.assertNotEqual(orders.count(), 0)
 
     def test_payOrders(self):
         self.client.login(username='test', password='passtest')
         response = self.client.post(reverse('pay_orders'), {'pay': 1})
-        self.status = Order.objects.all().first().status
+        self.status = Orders.objects.all().first().status
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(self.status, 'PA')
 
 
 class ProductsTestCase(TestCase):
     def setUp(self):
-        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56)
+        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
+        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
         test_product.save()
 
     def test_url(self):
@@ -294,7 +277,7 @@ class ProductsTestCase(TestCase):
         self.assertNotEqual(products, 0)
 
     def test_ProductsPOST_delete(self):
-        response = self.client.post(reverse('products'), {'submit': 1})
+        response = self.client.delete(reverse('products'), {'submit': 1})
         products = Products.objects.all().count()
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(products, 0)
@@ -307,51 +290,92 @@ class MessagesAPITest(APITestCase):
         self.user.set_password('passtest')
         self.user.save()
 
-        self.user = User.objects.create(username='test2')
-        self.user.set_password('passtest2')
-        self.user.save()
+        self.user2 = User.objects.create(username='test2')
+        self.user2.set_password('passtest2')
+        self.user2.save()
+
+        Token.objects.create(user=self.user)
 
     def test_url(self):
         url = reverse('api-message')
         self.assertEqual(resolve(url).func.view_class, Message)
 
     def test_postNewMessage(self):
-        response = self.client.post(reverse('api-message'), {'sender': 1, 'receiver': 2, 'date': "2024-04-22", "message": "test message 1"})
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {'sender': 1, 'receiver': 2, 'date': "2024-04-22", "message": "test message 1"}
+        response = self.client.post(reverse('api-message'), data=data, format="json")
         message = Messages.objects.get(id=1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(message.message, "test message 1")
 
     def test_getAllMessages(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
         response = self.client.get(reverse('api-message'))
         messages = Messages.objects.all()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(messages.count(), 1)
 
     def test_getMessagesFromUser(self):
-        response = self.client.get(reverse('api-message'), sender="1")
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"sender": 1}
+        response = self.client.get(reverse('api-message'), data)
         messages = Messages.objects.get(sender=1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(messages.count(), 1)
-        for msg in response.data:
+        for msg in response.json():
             self.assertEqual(msg.sender, 1)
             self.assertEqual(msg.receiver, 2)
             self.assertEqual(msg.message, "test message 1")
 
     def test_getSpecificMessage(self):
-        response = self.client.get(reverse('api-message'), message_id="1")
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"message_id": 1}
+        response = self.client.get(reverse('api-message'), data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.sender, 1)
-        self.assertEqual(response.data.receiver, 2)
-        self.assertEqual(response.data.message, "test message 1")
+        self.assertEqual(response.json()["sender"], 1)
+        self.assertEqual(response.json()["receiver"], 2)
+        self.assertEqual(response.json()["message"], "test message 1")
 
     def test_getSpecificMessageWrongId(self):
-        response = self.client.get(reverse('api-message'), message_id="4")
-        print(response.status_code)
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"message_id": 4}
+        response = self.client.get(reverse('api-message'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_getMessagesFromInexistentUser(self):
-        response = self.client.get(reverse('api-message'), sender="4")
-        print(response.status_code)
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"sender": 4}
+        response = self.client.get(reverse('api-message'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_postNewMessageWithInexistentSender(self):
@@ -361,11 +385,25 @@ class MessagesAPITest(APITestCase):
         pass
 
     def test_DeleteMessageWrongId(self):
-        response = self.client.delete(reverse('api-message'), message_id="7")
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"message_id": 7}
+        response = self.client.delete(reverse('api-message'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_DeleteMessage(self):
-        response = self.client.delete(reverse('api-message'), message_id="1")
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"message_id": 1}
+        response = self.client.delete(reverse('api-message'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         messages = Messages.objects.all()
         self.assertEqual(messages.count(), 0)

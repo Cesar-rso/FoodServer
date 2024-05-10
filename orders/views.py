@@ -37,8 +37,12 @@ class Order(APIView):
         else:
             order = Orders.objects.all()
 
-        serializer = OrderSerializer(order)
-        response = serializer.data
+        if not order:
+            response = {"exception": "Couldn't find requested order!"}
+        
+        else:
+            serializer = OrderSerializer(order)
+            response = serializer.data
 
         return Response(response)
 
@@ -110,7 +114,11 @@ class Product(APIView):
 
         data = request.GET
         if data['id']:
-            products = Products.objects.get(pk=int(data['id']))       
+            try:
+                products = Products.objects.get(pk=int(data['id'])) 
+            except:
+                resp = {"exception": "Couldn't find requested product!"}
+                return Response(resp)      
         else:
             products = Products.objects.all()
 
@@ -177,7 +185,11 @@ class Supplier(APIView):
         data = request.GET 
 
         if data['id']:
-            suppliers = Suppliers.objects.get(pk=data['id'])
+            try:
+                suppliers = Suppliers.objects.get(pk=data['id'])
+            except:
+                resp = {"exception": "Couldn't find requested supplier!"}
+                return Response(resp)
         else:
             suppliers = Suppliers.objects.all()
 
@@ -230,17 +242,22 @@ class Message(APIView):
     def get(self, request):
         data = request.GET
 
-        if "message_id" in data.keys():
-            messages = Messages.objects.get(id=data["message_id"])
-                     
-        elif "sender" in data.keys():
-            messages = Messages.objects.get(sender=data["sender"])
+        try:
+            if "message_id" in data.keys():
+                messages = Messages.objects.get(id=data["message_id"])
+                        
+            elif "sender" in data.keys():
+                sender = User.objects.get(id=data["sender"])
+                messages = Messages.objects.get(sender=sender)
 
-        else:
-            messages = Messages.objects.all()
+            else:
+                messages = Messages.objects.all()
 
-        serializer = MessageSerializer(messages)
-        resp = serializer.data
+            serializer = MessageSerializer(messages)
+            resp = serializer.data
+
+        except:
+            resp = {"status": "Error retriving messages!"} 
 
         return Response(resp)
         
@@ -248,7 +265,9 @@ class Message(APIView):
     def post(self, request):
         data = request.data
         
-        message = Messages(sender=data["sender"], receiver=data["receiver"], date=data["date"], message=data["message"])
+        sender = User.objects.get(id=data["sender"])
+        receiver = User.objects.get(id=data["receiver"])
+        message = Messages(sender=sender, receiver=receiver, date=data["date"], message=data["message"])
         message.save()
 
         resp = {"status": "Message sent!"}
@@ -258,11 +277,17 @@ class Message(APIView):
     def delete(self, request):
         data = request.data
 
-        message = Messages.objects.get(id=data["message_id"])
-        message.delete()
+        try:
+            message = Messages.objects.get(id=data["message_id"])
+            message.delete()
 
-        resp = {"status": "Message deleted!"}
-        return Response(resp)
+            resp = {"status": "Message deleted!"}
+            status = 200
+        except:
+            resp = {"status": "Couldn't find requested message!"}
+            status = 404
+
+        return Response(resp, status=status)
 
 
 # Web pages (front-end)

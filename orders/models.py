@@ -95,10 +95,12 @@ class Messages(models.Model):
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name='user_sender',
     )
     receiver = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name='user_receiver',
     )
     date = models.DateTimeField(default=datetime.datetime.now)
     message = models.CharField(max_length=800)
