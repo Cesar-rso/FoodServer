@@ -277,7 +277,7 @@ class ProductsTestCase(TestCase):
         self.assertNotEqual(products, 0)
 
     def test_ProductsPOST_delete(self):
-        response = self.client.delete(reverse('products'), {'submit': 1})
+        response = self.client.delete(reverse('products'), data={'delete_btn': 1})
         products = Products.objects.all().count()
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(products, 0)
@@ -334,7 +334,11 @@ class MessagesAPITest(APITestCase):
 
         data = {"sender": 1}
         response = self.client.get(reverse('api-message'), data)
-        messages = Messages.objects.get(sender=1)
+        try:
+            sender = User.objects.get(id=1)
+            messages = Messages.objects.filter(sender=sender)
+        except:
+            self.fail("DB error!")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(messages.count(), 1)
         for msg in response.json():
@@ -351,10 +355,14 @@ class MessagesAPITest(APITestCase):
 
         data = {"message_id": 1}
         response = self.client.get(reverse('api-message'), data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json()["sender"], 1)
-        self.assertEqual(response.json()["receiver"], 2)
-        self.assertEqual(response.json()["message"], "test message 1")
+        resp_data = response.json()
+        if len(resp_data.keys()) > 1:
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.json()["sender"], 1)
+            self.assertEqual(response.json()["receiver"], 2)
+            self.assertEqual(response.json()["message"], "test message 1")
+        else:
+            self.fail("API not returning expected data!")
 
     def test_getSpecificMessageWrongId(self):
         check_login = self.client.login(username='test', password='passtest')

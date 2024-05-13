@@ -34,7 +34,7 @@
             
                 <form method="delete">
                         {% csrf_token %}
-                    <button name="submit" type="submit" value="{{ product.id }}" style="position:relative; top:-130px; right:-650px;">{% translate "Delete Product" %}</button>
+                    <button name="delete_btn" type="submit" value="{{ product.id }}" style="position:relative; top:-130px; right:-650px;">{% translate "Delete Product" %}</button>
                 </form>
 
                 <div><a href="{% url 'update_product' pk=product.id %}"><h2 style="color:black; width:30%;"><pre> {% translate "Update Product" %} </pre></h2></a></div>

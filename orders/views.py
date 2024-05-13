@@ -361,8 +361,11 @@ class ListProducts (generic.ListView):
             return render(request, 'orders/products.html', context)
         
     def delete(self, request):
-        product = Products.objects.get(pk=request.POST['submit'])
-        product.delete()
+        try:
+            product = Products.objects.get(pk=request.POST.get('delete_btn', 0))
+            product.delete()
+        except:
+            return render(request=request, template_name="orders/error.html", context={"message": "Could not find id to delete!"}, status=404)
 
         return redirect('products')
     
