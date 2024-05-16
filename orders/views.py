@@ -265,8 +265,13 @@ class Message(APIView):
     def post(self, request):
         data = request.data
         
-        sender = User.objects.get(id=data["sender"])
-        receiver = User.objects.get(id=data["receiver"])
+        try:
+            sender = User.objects.get(id=data["sender"])
+            receiver = User.objects.get(id=data["receiver"])
+        except:
+            resp = {"status": "Couldn't find user for sender and/or receiver!"}
+            status = 404
+            return Response(resp, status=status)
         message = Messages(sender=sender, receiver=receiver, date=data["date"], message=data["message"])
         message.save()
 

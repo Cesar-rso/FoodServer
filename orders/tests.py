@@ -387,10 +387,28 @@ class MessagesAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_postNewMessageWithInexistentSender(self):
-        pass
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {'sender': 9, 'receiver': 2, 'date': "2024-04-22", "message": "test message 1"}
+        response = self.client.post(reverse('api-message'), data=data, format="json")
+        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_postNewMessageWithInexistentReceiver(self):
-        pass
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {'sender': 1, 'receiver': 9, 'date': "2024-04-22", "message": "test message 1"}
+        response = self.client.post(reverse('api-message'), data=data, format="json")
+        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_DeleteMessageWrongId(self):
         check_login = self.client.login(username='test', password='passtest')
