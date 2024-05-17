@@ -244,10 +244,10 @@ class Message(APIView):
 
         try:
             if "message_id" in data.keys():
-                messages = Messages.objects.get(id=data["message_id"])
+                messages = Messages.objects.get(pk=data["message_id"])
                         
             elif "sender" in data.keys():
-                sender = User.objects.get(id=data["sender"])
+                sender = User.objects.get(pk=data["sender"])
                 messages = Messages.objects.get(sender=sender)
 
             else:
@@ -257,7 +257,9 @@ class Message(APIView):
             resp = serializer.data
 
         except:
-            resp = {"status": "Error retriving messages!"} 
+            status = 404
+            resp = {"status": "Error retriving messages!"}
+            return Response(resp, status=status)
 
         return Response(resp)
         
@@ -266,8 +268,8 @@ class Message(APIView):
         data = request.data
         
         try:
-            sender = User.objects.get(id=data["sender"])
-            receiver = User.objects.get(id=data["receiver"])
+            sender = User.objects.get(pk=data["sender"])
+            receiver = User.objects.get(pk=data["receiver"])
         except:
             resp = {"status": "Couldn't find user for sender and/or receiver!"}
             status = 404
@@ -283,7 +285,7 @@ class Message(APIView):
         data = request.data
 
         try:
-            message = Messages.objects.get(id=data["message_id"])
+            message = Messages.objects.get(pk=data["message_id"])
             message.delete()
 
             resp = {"status": "Message deleted!"}

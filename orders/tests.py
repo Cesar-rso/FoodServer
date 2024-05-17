@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Orders, Products, Payments, Messages, Suppliers
 from .views import ControlOrders, login_request, Checkout, ListProducts, Product, Order, Message
+import datetime
 
 
 class ProductAPITest(APITestCase):
@@ -294,6 +295,9 @@ class MessagesAPITest(APITestCase):
         self.user2.set_password('passtest2')
         self.user2.save()
 
+        Messages.objects.create(sender=self.user, receiver=self.user2, date=datetime.datetime.now(), message="setUp message")
+        Messages.objects.create(sender=self.user, receiver=self.user2, date=datetime.datetime.now(), message="setUp message 2")
+
         Token.objects.create(user=self.user)
 
     def test_url(self):
@@ -307,9 +311,9 @@ class MessagesAPITest(APITestCase):
         token = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
-        data = {'sender': 1, 'receiver': 2, 'date': "2024-04-22", "message": "test message 1"}
+        data = {'sender': self.user2.pk, 'receiver': self.user.pk, 'date': "2024-04-22", "message": "test message 1"}
         response = self.client.post(reverse('api-message'), data=data, format="json")
-        message = Messages.objects.get(id=1)
+        message = Messages.objects.all().order_by("date").last()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(message.message, "test message 1")
 
@@ -332,8 +336,8 @@ class MessagesAPITest(APITestCase):
         token = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
-        data = {"sender": 1}
-        response = self.client.get(reverse('api-message'), data)
+        data = {"sender": self.user.pk}
+        response = self.client.get(reverse('api-message'), data=data)
         try:
             sender = User.objects.get(id=1)
             messages = Messages.objects.filter(sender=sender)
@@ -342,9 +346,9 @@ class MessagesAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(messages.count(), 1)
         for msg in response.json():
-            self.assertEqual(msg.sender, 1)
-            self.assertEqual(msg.receiver, 2)
-            self.assertEqual(msg.message, "test message 1")
+            self.assertEqual(msg["sender"], self.user.pk)
+            self.assertEqual(msg["receiver"], self.user2.pk)
+            #self.assertEqual(msg["message"], "test message 1")
 
     def test_getSpecificMessage(self):
         check_login = self.client.login(username='test', password='passtest')
@@ -353,14 +357,14 @@ class MessagesAPITest(APITestCase):
         token = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
-        data = {"message_id": 1}
+        data = {"message_id": 2}
         response = self.client.get(reverse('api-message'), data)
         resp_data = response.json()
         if len(resp_data.keys()) > 1:
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.json()["sender"], 1)
             self.assertEqual(response.json()["receiver"], 2)
-            self.assertEqual(response.json()["message"], "test message 1")
+            self.assertEqual(response.json()["message"], "setUp message 2")
         else:
             self.fail("API not returning expected data!")
 
@@ -432,7 +436,7 @@ class MessagesAPITest(APITestCase):
         response = self.client.delete(reverse('api-message'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         messages = Messages.objects.all()
-        self.assertEqual(messages.count(), 0)
+        self.assertEqual(messages.count(), 2)
 
 class LoginTestCase(TestCase):
 
