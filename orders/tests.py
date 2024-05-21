@@ -259,7 +259,7 @@ class CheckoutTestCase(TestCase):
 class ProductsTestCase(TestCase):
     def setUp(self):
         sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
-        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
+        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
         test_product.save()
 
     def test_url(self):
@@ -278,7 +278,7 @@ class ProductsTestCase(TestCase):
         self.assertNotEqual(products, 0)
 
     def test_ProductsPOST_delete(self):
-        response = self.client.delete(reverse('products'), data={'delete_btn': 1})
+        response = self.client.post(reverse('products'), data={'delete_btn': 1})
         products = Products.objects.all().count()
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(products, 0)
@@ -311,7 +311,7 @@ class MessagesAPITest(APITestCase):
         token = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
-        data = {'sender': self.user2.pk, 'receiver': self.user.pk, 'date': "2024-04-22", "message": "test message 1"}
+        data = {'sender': self.user2.pk, 'receiver': self.user.pk, 'date': str(datetime.datetime.now()), "message": "test message 1"}
         response = self.client.post(reverse('api-message'), data=data, format="json")
         message = Messages.objects.all().order_by("date").last()
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -265,7 +265,7 @@ class Message(APIView):
         
 
     def post(self, request):
-        data = request.data
+        data = request.POST
         
         try:
             sender = User.objects.get(pk=data["sender"])
@@ -367,14 +367,14 @@ class ListProducts (generic.ListView):
 
             return render(request, 'orders/products.html', context)
         
-    def delete(self, request):
-        try:
-            product = Products.objects.get(pk=request.POST.get('delete_btn', 0))
-            product.delete()
-        except:
-            return render(request=request, template_name="orders/error.html", context={"message": "Could not find id to delete!"}, status=404)
+        if 'delete_btn' in request.POST.keys() and request.POST['delete_btn'] != '':
+            try:
+                product = Products.objects.get(pk=request.POST['delete_btn'])
+                product.delete()
+            except:
+                return render(request=request, template_name="orders/error.html", context={"message": "Could not find id to delete!"}, status=404)
 
-        return redirect('products')
+            return redirect('products')
     
 
 class ListSuppliers(generic.ListView):
