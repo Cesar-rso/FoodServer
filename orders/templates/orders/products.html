@@ -32,7 +32,7 @@
            
             <br>
             
-                <form method="post">
+                <form method="delete">
                         {% csrf_token %}
                     <button name="delete_btn" type="submit" value="{{ product.id }}" style="position:relative; top:-130px; right:-650px;">{% translate "Delete Product" %}</button>
                 </form>

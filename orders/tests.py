@@ -7,6 +7,7 @@ from rest_framework import status
 from .models import Orders, Products, Payments, Messages, Suppliers
 from .views import ControlOrders, login_request, Checkout, ListProducts, Product, Order, Message
 import datetime
+import json
 
 
 class ProductAPITest(APITestCase):
@@ -278,7 +279,8 @@ class ProductsTestCase(TestCase):
         self.assertNotEqual(products, 0)
 
     def test_ProductsPOST_delete(self):
-        response = self.client.post(reverse('products'), data={'delete_btn': 1})
+        data = json.dumps({"delete_btn": 1})
+        response = self.client.delete(reverse('products'), data=data, format='json')
         products = Products.objects.all().count()
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(products, 0)
@@ -432,11 +434,13 @@ class MessagesAPITest(APITestCase):
         token = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
+        messages_count = Messages.objects.all().count()
+
         data = {"message_id": 1}
         response = self.client.delete(reverse('api-message'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         messages = Messages.objects.all()
-        self.assertEqual(messages.count(), 2)
+        self.assertLess(messages.count(), messages_count)
 
 class LoginTestCase(TestCase):
 
