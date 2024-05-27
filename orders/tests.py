@@ -279,8 +279,8 @@ class ProductsTestCase(TestCase):
         self.assertNotEqual(products, 0)
 
     def test_ProductsPOST_delete(self):
-        data = json.dumps({"delete_btn": 1})
-        response = self.client.delete(reverse('products'), data=data, format='json')
+        data = {"delete_btn": 1}
+        response = self.client.post(reverse('products'), data=data, format='json')
         products = Products.objects.all().count()
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(products, 0)
@@ -338,11 +338,10 @@ class MessagesAPITest(APITestCase):
         token = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
-        data = {"sender": self.user.pk}
-        response = self.client.get(reverse('api-message'), data=data)
+        data = {"sender": 1}
+        response = self.client.get(reverse('api-message'), data)
         try:
-            sender = User.objects.get(id=1)
-            messages = Messages.objects.filter(sender=sender)
+            messages = Messages.objects.filter(sender=self.user)
         except:
             self.fail("DB error!")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

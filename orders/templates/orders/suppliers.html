@@ -31,9 +31,9 @@
             </div>
             <br>
             <div>
-                <form method="delete">
+                <form method="post">
                         {% csrf_token %}
-                    <button name="submit" type="submit" value="{{ supplier.id }}" style="position:relative; top:-130px; right:-800px;">{% translate "Delete Supplier" %}</button>
+                    <button name="delete_btn" type="submit" value="{{ supplier.id }}" style="position:relative; top:-130px; right:-800px;">{% translate "Delete Supplier" %}</button>
                 </form>
             </div>
             <div><a href="{% url 'update_supplier' pk=supplier.id %}"><h2 style="color:black; width:30%;"><pre> {% translate "Update Supplier" %} </pre></h2></a></div>

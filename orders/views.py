@@ -240,17 +240,18 @@ class Message(APIView):
     parser_classes = (JSONParser,)
 
     def get(self, request):
-        data = request.GET
+        data = request.query_params
+        #print('\n', data.keys(), '\n')
 
         try:
-            if "message_id" in data.keys():
+            if "message_id" in list(data.keys()):
                 messages = Messages.objects.get(pk=data["message_id"])
                         
-            elif "sender" in data.keys():
+            if "sender" in list(data.keys()):
                 sender = User.objects.get(pk=data["sender"])
-                messages = Messages.objects.get(sender=sender)
+                messages = Messages.objects.filter(sender=sender)
 
-            else:
+            if len(data) == 0:
                 messages = Messages.objects.all()
 
             serializer = MessageSerializer(messages)
@@ -265,8 +266,7 @@ class Message(APIView):
         
 
     def post(self, request):
-        #data = request.POST
-        data = json.loads(request.body)
+        data = request.data
         
         try:
             sender = User.objects.get(pk=data["sender"])
@@ -284,7 +284,6 @@ class Message(APIView):
 
     def delete(self, request):
         data = request.data
-        #data = json.loads(request.body)
 
         try:
             message = Messages.objects.get(pk=data["message_id"])
@@ -369,25 +368,14 @@ class ListProducts (generic.ListView):
 
             return render(request, 'orders/products.html', context)
         
-        #if 'delete_btn' in request.POST.keys() and request.POST['delete_btn'] != '':
-        #    try:
-        #        product = Products.objects.get(pk=request.POST['delete_btn'])
-        #        product.delete()
-        #    except:
-        #        return render(request=request, template_name="orders/error.html", context={"message": "Could not find id to delete!"}, status=404)
-        #
-        #    return redirect('products')
-        
-    def delete(self, request):
-        data = json.loads(request.body) 
-
-        if data:
+        if 'delete_btn' in request.POST.keys() and request.POST['delete_btn'] != '':
             try:
-                product = Products.objects.get(pk=data['delete_btn'])
+                product = Products.objects.get(pk=request.POST['delete_btn'])
                 product.delete()
-                return redirect('products')
             except:
                 return render(request=request, template_name="orders/error.html", context={"message": "Could not find id to delete!"}, status=404)
+        
+            return redirect('products')
     
 
 class ListSuppliers(generic.ListView):
@@ -400,30 +388,24 @@ class ListSuppliers(generic.ListView):
         return Suppliers.objects.all().order_by('name')
     
     def post(self, request):
-        supp_id = request.POST['search']
-        if supp_id.isdecimal():
-            supplier = Suppliers.objects.filter(pk=int(supp_id))
-        else:
-            supplier = Suppliers.objects.filter(name=supp_id)
-        context = {'suppliers': supplier}
+        if 'search' in request.POST.keys() and request.POST['search'] != '':
+            supp_id = request.POST['search']
+            if supp_id.isdecimal():
+                supplier = Suppliers.objects.filter(pk=int(supp_id))
+            else:
+                supplier = Suppliers.objects.filter(name=supp_id)
+            context = {'suppliers': supplier}
 
-        return render(request, 'order/suppliers.html', context)
-    
-    def put(self, request):
-        supplier = Suppliers.objects.get(pk=request.POST['id'])
-        supplier.name = request.POST['name']
-        supplier.address = request.POST['address']
-        supplier.phone = request.POST['phone']
-        supplier.supply_type = request.POST['supply_type']
-        supplier.save()
-
-        return redirect('suppliers')
-    
-    def delete(self, request):
-        supplier = Suppliers.objects.get(pk=request.POST['submit'])
-        supplier.delete()
-
-        return redirect('suppliers')
+            return render(request, 'order/suppliers.html', context)
+        
+        if 'delete_btn' in request.POST.keys() and request.POST['delete_btn'] != '':
+            try:
+                suppli = Suppliers.objects.get(pk=request.POST['delete_btn'])
+                suppli.delete()
+            except:
+                return render(request=request, template_name="orders/error.html", context={"message": "Could not find id to delete!"}, status=404)
+        
+            return redirect('suppliers')
     
 
 class ListUsers(generic.ListView):
