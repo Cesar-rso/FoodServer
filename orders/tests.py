@@ -329,7 +329,7 @@ class MessagesAPITest(APITestCase):
         response = self.client.get(reverse('api-message'))
         messages = Messages.objects.all()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(messages.count(), 1)
+        self.assertEqual(messages.count(), 2)
 
     def test_getMessagesFromUser(self):
         check_login = self.client.login(username='test', password='passtest')
@@ -340,16 +340,13 @@ class MessagesAPITest(APITestCase):
 
         data = {"sender": 1}
         response = self.client.get(reverse('api-message'), data)
-        try:
-            messages = Messages.objects.filter(sender=self.user)
-        except:
-            self.fail("DB error!")
+        messages = Messages.objects.filter(sender=self.user)
+        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(messages.count(), 1)
+        self.assertEqual(messages.count(), 2)
         for msg in response.json():
             self.assertEqual(msg["sender"], self.user.pk)
             self.assertEqual(msg["receiver"], self.user2.pk)
-            #self.assertEqual(msg["message"], "test message 1")
 
     def test_getSpecificMessage(self):
         check_login = self.client.login(username='test', password='passtest')

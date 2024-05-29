@@ -241,26 +241,26 @@ class Message(APIView):
 
     def get(self, request):
         data = request.query_params
-        #print('\n', data.keys(), '\n')
 
         try:
             if "message_id" in list(data.keys()):
                 messages = Messages.objects.get(pk=data["message_id"])
+                serializer = MessageSerializer(messages)
                         
             if "sender" in list(data.keys()):
                 sender = User.objects.get(pk=data["sender"])
                 messages = Messages.objects.filter(sender=sender)
+                serializer = MessageSerializer(messages, many=True)
 
             if len(data) == 0:
                 messages = Messages.objects.all()
-
-            serializer = MessageSerializer(messages)
-            resp = serializer.data
-
+                serializer = MessageSerializer(messages, many=True)
         except:
             status = 404
             resp = {"status": "Error retriving messages!"}
             return Response(resp, status=status)
+
+        resp = serializer.data
 
         return Response(resp)
         
