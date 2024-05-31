@@ -19,7 +19,7 @@ class ProductAPITest(APITestCase):
         url = reverse('check-product')
         self.assertEqual(resolve(url).func.view_class, Product)
 
-    def test_correctID(self):
+    def test_CheckCorrectID(self):
         product = Products.objects.all().first()
         search = {"id": product.pk}
         url = reverse('check-product')
@@ -31,7 +31,7 @@ class ProductAPITest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, product_data)
 
-    def test_wrongID(self):
+    def test_CheckWrongID(self):
         search = {"id": 2}
         url = reverse('check-product')
 
@@ -40,6 +40,17 @@ class ProductAPITest(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, product_data)
+
+    def test_POSTnewProduct(self):
+
+        product_data = {"name": "testProduct 2", "description": "-test-", "price": 3.15, "cost": 0.60,
+                                         "picture": "/media/default.jpg", "supplier": 1}
+        url = reverse('check-product')
+        response = self.client.post(url, product_data, content_type="json")
+        all_products = Products.objects.all()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(all_products.count(), 2)
 
 
 class OrderAPITest(APITestCase):

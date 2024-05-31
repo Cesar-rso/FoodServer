@@ -189,7 +189,8 @@ class Supplier(APIView):
                 suppliers = Suppliers.objects.get(pk=data['id'])
             except:
                 resp = {"exception": "Couldn't find requested supplier!"}
-                return Response(resp)
+                status = 404
+                return Response(resp, status)
         else:
             suppliers = Suppliers.objects.all()
 
