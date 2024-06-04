@@ -132,7 +132,7 @@ class Product(APIView):
 
         product = Products(name = data['name'], description=data['description'], price=data['price'], cost=data['cost'], picture=data['picture'])
         product.save()
-        supplier = Supplier.objects.get(id=data['supplier'])
+        supplier = Suppliers.objects.get(id=data['supplier'])
 
         if supplier:
             product.supplier = supplier
@@ -152,7 +152,7 @@ class Product(APIView):
             product.cost = data['cost']
             product.picture = data['picture']
 
-            supplier = Supplier.objects.get(pk=data['supplier'])
+            supplier = Suppliers.objects.get(pk=data['supplier'])
             if supplier:
                 product.supplier = supplier
 

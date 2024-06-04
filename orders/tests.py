@@ -32,7 +32,7 @@ class ProductAPITest(APITestCase):
         self.assertEqual(response.data, product_data)
 
     def test_CheckWrongID(self):
-        search = {"id": 2}
+        search = {"id": 5}
         url = reverse('check-product')
 
         response = self.client.get(url, search)
@@ -46,11 +46,32 @@ class ProductAPITest(APITestCase):
         product_data = {"name": "testProduct 2", "description": "-test-", "price": 3.15, "cost": 0.60,
                                          "picture": "/media/default.jpg", "supplier": 1}
         url = reverse('check-product')
-        response = self.client.post(url, product_data, content_type="json")
+        response = self.client.post(url, product_data, format="json")
         all_products = Products.objects.all()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(all_products.count(), 2)
+
+    def test_UpdateProduct(self):
+        product_data = {"id": 2,"name": "testProduct 2", "description": "-test2-", "price": 4.52, "cost": 0.60,
+                                         "picture": "/media/default.jpg", "supplier": 1}
+        url = reverse('check-product')
+        response = self.client.put(url, product_data, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        # prod = Products.objects.all().last()
+        # self.assertEqual(prod.price, product_data["price"])
+        # self.assertEqual(prod.description, product_data["description"])
+
+    def test_DeleteProduct(self):
+        product_data = {"id": 2}
+
+        url = reverse('check-product')
+        response = self.client.delete(url, product_data, format="json")
+        all_products = Products.objects.all()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(all_products.count(), 1)
 
 
 class OrderAPITest(APITestCase):
