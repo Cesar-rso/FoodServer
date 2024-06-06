@@ -7,13 +7,13 @@ from rest_framework import status
 from .models import Orders, Products, Payments, Messages, Suppliers
 from .views import ControlOrders, login_request, Checkout, ListProducts, Product, Order, Message
 import datetime
-import json
 
 
 class ProductAPITest(APITestCase):
     def setUp(self):
         sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
         Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
+        Products.objects.create(id=2, name='testProduct 2', description='-test-', price=4.16, cost=2.12, supplier=sup)
 
     def test_url(self):  # Verifying if the correct url resolves
         url = reverse('check-product')
@@ -28,7 +28,7 @@ class ProductAPITest(APITestCase):
         product_data = {"id": 1, "name": "testProduct", "description": "-test-", "price": 2.56, "cost": 1.80,
                                          "picture": "/media/default.jpg", "supplier": 1}
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, product_data)
 
     def test_CheckWrongID(self):
@@ -38,30 +38,46 @@ class ProductAPITest(APITestCase):
         response = self.client.get(url, search)
         product_data = {"exception": "Couldn't find requested product!"}
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, product_data)
 
     def test_POSTnewProduct(self):
 
-        product_data = {"name": "testProduct 2", "description": "-test-", "price": 3.15, "cost": 0.60,
+        product_data = {"name": "testProduct 3", "description": "-test-", "price": 3.15, "cost": 0.60,
                                          "picture": "/media/default.jpg", "supplier": 1}
         url = reverse('check-product')
         response = self.client.post(url, product_data, format="json")
         all_products = Products.objects.all()
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(all_products.count(), 2)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(all_products.count(), 3)
 
     def test_UpdateProduct(self):
-        product_data = {"id": 2,"name": "testProduct 2", "description": "-test2-", "price": 4.52, "cost": 0.60,
+        product_data = {"id": 1,"name": "testProduct 1", "description": "-test-", "price": 3.52, "cost": 1.60,
                                          "picture": "/media/default.jpg", "supplier": 1}
         url = reverse('check-product')
         response = self.client.put(url, product_data, format="json")
 
-        self.assertEqual(response.status_code, 200)
-        # prod = Products.objects.all().last()
-        # self.assertEqual(prod.price, product_data["price"])
-        # self.assertEqual(prod.description, product_data["description"])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        prod = Products.objects.get(id=1)
+        self.assertEqual(prod.price, product_data["price"])
+        self.assertEqual(prod.description, product_data["description"])
+
+    def test_UpdateProductWrongID(self):
+        product_data = {"id": 9,"name": "testProduct 1", "description": "-test-", "price": 8.52, "cost": 1.60,
+                                         "picture": "/media/default.jpg", "supplier": 1}
+        url = reverse('check-product')
+        response = self.client.put(url, product_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_DeleteProductWrongID(self):
+        product_data = {"id": 9}
+
+        url = reverse('check-product')
+        response = self.client.delete(url, product_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_DeleteProduct(self):
         product_data = {"id": 2}
@@ -70,7 +86,7 @@ class ProductAPITest(APITestCase):
         response = self.client.delete(url, product_data, format="json")
         all_products = Products.objects.all()
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(all_products.count(), 1)
 
 
@@ -131,7 +147,7 @@ class OrderAPITest(APITestCase):
         order = Orders.objects.filter(table=1).order_by('date')[0]
         rt_data = {"exception": "Couldn't find requested order!"}
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(order.status, Orders.Status.WAITING)
         self.assertEqual(response.data, rt_data)
 
@@ -145,7 +161,6 @@ class OrderAPITest(APITestCase):
         data = {"table": 1}
         response = self.client.get(reverse("api-orders"), data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # print(response.data)
 
     def testCheckOrderWithWrongTableNumber(self):
         check_login = self.client.login(username='test', password='passtest')
@@ -157,7 +172,7 @@ class OrderAPITest(APITestCase):
         data = {"table": 5}
         resp = {"exception": "Couldn't find requested order!"}
         response = self.client.get(reverse("api-orders"), data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, resp)
 
     def testPlaceOrderWithCorrectDataNoToken(self):
@@ -205,7 +220,7 @@ class OrderAPITest(APITestCase):
         data = {"products": {"product1": 3}, "table": 1, "status": "WA"}
         response = self.client.post(reverse("api-orders"), data, format="json")
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["status"], "Error! Could not find product!")
 
 

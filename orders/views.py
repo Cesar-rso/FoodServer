@@ -39,12 +39,14 @@ class Order(APIView):
 
         if not order:
             response = {"exception": "Couldn't find requested order!"}
+            status = 404
         
         else:
+            status = 200
             serializer = OrderSerializer(order)
             response = serializer.data
 
-        return Response(response)
+        return Response(response, status)
 
     def post(self, request):
         data = request.data
@@ -53,21 +55,25 @@ class Order(APIView):
         order.save()
         products = data['products']
         
-        stats = "Order placed!"
+        status = 200
         for product in products:
             try:
                 p1 = Products.objects.get(pk=products[product])
                 order.product.add(p1)
                 
-            except Exception as e:
-                stats = "Error! Could not find product!"
+            except Exception:
+                resp = {"status": "Error! Could not find product!"}
+                status = 404
+                return Response(resp, status)
+            
         order.save()
-        resp = {"status": stats}
+        resp = {"status": "Order placed!"}
 
-        return Response(resp)
+        return Response(resp, status)
     
     def put(self, request):
         data = request.data
+        status = 200
 
         order = Orders.objects.get(pk=data['id'])
         order.table = data['table']
@@ -76,18 +82,20 @@ class Order(APIView):
         
         products = data['products']
         
-        stats = "Order updated!"
         for product in products:
             try:
                 p1 = Products.objects.get(pk=products[product])
                 order.product.add(p1)
                 
-            except Exception as e:
-                stats = "Error! Could not find product!"
+            except Exception:
+                status = 404
+                resp = {"status": "Error! Could not find product!"}
+                return Response(resp, status)
+            
         order.save()
-        resp = {"status": stats}
+        resp = {"status": "Order updated!"}
 
-        return Response(resp)
+        return Response(resp, status)
     
     def delete(self, request):
         data = request.data
@@ -96,14 +104,17 @@ class Order(APIView):
             order = Orders.objects.filter(table=data['table']).order_by('date').first()
             if order is None:
                 resp = {"exception": "Couldn't find requested order!"}
+                status = 404
             else:
                 order.status = Orders.Status.CANCELED
                 order.save()
                 resp = {"status": "Order canceled!"}
+                status = 200
         except ObjectDoesNotExist:
             resp = {"exception": "Couldn't find requested order!"}
+            status = 404
 
-        return Response(resp)
+        return Response(resp, status)
 
 
 class Product(APIView):
@@ -115,10 +126,10 @@ class Product(APIView):
         data = request.GET
         if data['id']:
             try:
-                products = Products.objects.get(pk=int(data['id'])) 
+                products = Products.objects.get(pk=int(data['id']))
             except:
                 resp = {"exception": "Couldn't find requested product!"}
-                return Response(resp)      
+                return Response(resp, status=404)      
         else:
             products = Products.objects.all()
 
@@ -156,12 +167,16 @@ class Product(APIView):
             if supplier:
                 product.supplier = supplier
 
+            product.save()
+
             resp = {"status": "Product successfully updated!"}
+            status = 200
 
         except Exception as e:
             resp = {"status": f"{e}"}
+            status = 404
 
-        return Response(resp)
+        return Response(resp, status)
     
     def delete(self, request):
         data = request.data 
@@ -170,10 +185,12 @@ class Product(APIView):
             product = Products.objects.get(pk=data['id'])
             product.delete()
             resp = {"status": "Product successfully deleted!"}
+            status = 200
         except Exception as e:
             resp = {"status": f"{e}"}
+            status = 404
 
-        return Response(resp)
+        return Response(resp, status)
     
 
 class Supplier(APIView):
