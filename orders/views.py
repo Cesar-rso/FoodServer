@@ -217,27 +217,38 @@ class Supplier(APIView):
         return Response(response)
     
     def post(self, request):
-        data = request.data 
+        data = request.data
+        status = 200 
 
-        supplier = Suppliers(name=data['name'], address=data['address'], phone=data['phone'], supply_type=data['supply_type'])
-        supplier.save()
+        try:
+            supplier = Suppliers(name=data['name'], address=data['address'], phone=data['phone'], supply_type=data['supply_type'])
+            supplier.save()
 
-        resp = {"status": "New supplier successfully registered!"}
+            resp = {"status": "New supplier successfully registered!"}
+        except:
+            status = 500
+            resp = {"status": "Error saving supplier data!"}
 
-        return Response(resp)
+        return Response(resp, status)
     
     def put(self, request):
-        data = request.data 
+        data = request.data
+        status = 200 
 
-        supplier = Suppliers.objects.get(pk=data['id'])
-        supplier.name = data['name']
-        supplier.address = data['address']
-        supplier.phone = data['phone']
-        supplier.supply_type = data['supply_type']
-        supplier.save()
+        try:
+            supplier = Suppliers.objects.get(pk=data['id'])
+            supplier.name = data['name']
+            supplier.address = data['address']
+            supplier.phone = data['phone']
+            supplier.supply_type = data['supply_type']
+            supplier.save()
 
-        resp = {"status": "Supplier successfully updated!"}
-        return Response(resp)
+            resp = {"status": "Supplier successfully updated!"}
+        except:
+            status = 404
+            resp = {"status": "Supplier not found!"}
+
+        return Response(resp, status)
     
     def delete(self, request):
         data = request.data 

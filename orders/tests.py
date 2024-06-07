@@ -224,115 +224,6 @@ class OrderAPITest(APITestCase):
         self.assertEqual(response.data["status"], "Error! Could not find product!")
 
 
-class OrdersTestCase(TestCase):
-    def setUp(self):
-        user = User.objects.create(username='test')
-        user.set_password('passtest')
-        user.save()
-        Payments.objects.create(value=0.0, user=user)
-        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
-        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
-        test_product.save()
-        test_order = Orders.objects.create(table=1, status='WA')
-        test_order.save()
-        test_order.product.add(test_product)
-
-    def test_url(self):  # Verifying if the correct url resolves
-        url = reverse('orders')
-        self.assertEqual(resolve(url).func.view_class, ControlOrders)
-
-    def test_OrdersGET(self):
-        response = self.client.get(reverse('orders'))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTemplateUsed(response, 'orders/orders.html')
-
-    def test_OrdersPOST(self):
-        response = self.client.post(reverse('orders'), {'submit': 1, 'status': 'PP'})
-        current_status = Orders.objects.get(pk=1).status
-        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        self.assertEqual(current_status, 'PP')
-
-    def test_OrdersDELETE(self):
-        order_to_delete = Orders.objects.all().first().pk
-        response = self.client.post(reverse('orders'), {'delete': order_to_delete, 'status': 'PP'})
-        orders = Orders.objects.all()
-        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        self.assertEqual(orders.count(), 1)
-
-
-class CheckoutTestCase(TestCase):
-    def setUp(self):
-        user = User.objects.create(username='test')
-        user.set_password('passtest')
-        user.save()
-        Payments.objects.create(value=0.0, user=user)
-        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
-        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
-        test_product.save()
-        test_order = Orders.objects.create(table=1, status='WA')
-        test_order.save()
-        test_order.product.add(test_product)
-
-    def test_url(self):  # Verifying if the correct url resolves
-        url = reverse('checkout')
-        self.assertEqual(resolve(url).func.view_class, Checkout)
-
-    def test_CheckoutGET(self):
-        response = self.client.get(reverse('checkout'))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTemplateUsed(response, 'orders/checkout.html')
-
-    def test_CheckoutPOST(self):
-        response = self.client.post(reverse('checkout'), {'search': 1})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_CheckoutPOST_empty(self):
-        response = self.client.post(reverse('checkout'))
-        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-
-    def test_CheckoutPOST_SQL_injection(self):
-        response = self.client.post(reverse('checkout'), {'search': '\'); DELETE * FROM Order;'})
-        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        orders = Orders.objects.all()
-        self.assertNotEqual(orders.count(), 0)
-
-    def test_payOrders(self):
-        self.client.login(username='test', password='passtest')
-        response = self.client.post(reverse('pay_orders'), {'pay': 1})
-        self.status = Orders.objects.all().first().status
-        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        self.assertEqual(self.status, 'PA')
-
-
-class ProductsTestCase(TestCase):
-    def setUp(self):
-        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
-        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
-        test_product.save()
-
-    def test_url(self):
-        url = reverse('products')
-        self.assertEqual(resolve(url).func.view_class, ListProducts)
-
-    def test_ProductsPOST_search(self):
-        response = self.client.post(reverse('products'), {'search': 1})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTemplateUsed(response, 'orders/products.html')
-
-    def test_ProductsPOST_search_SQL_Injection(self):
-        response = self.client.post(reverse('products'), {'search': '1\'); DELETE * FROM Products;'})
-        products = Products.objects.all().count()
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertNotEqual(products, 0)
-
-    def test_ProductsPOST_delete(self):
-        data = {"delete_btn": 1}
-        response = self.client.post(reverse('products'), data=data, format='json')
-        products = Products.objects.all().count()
-        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        self.assertEqual(products, 0)
-
-
 class MessagesAPITest(APITestCase):
 
     def setUp(self) -> None:
@@ -484,6 +375,116 @@ class MessagesAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         messages = Messages.objects.all()
         self.assertLess(messages.count(), messages_count)
+
+
+class OrdersTestCase(TestCase):
+    def setUp(self):
+        user = User.objects.create(username='test')
+        user.set_password('passtest')
+        user.save()
+        Payments.objects.create(value=0.0, user=user)
+        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
+        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
+        test_product.save()
+        test_order = Orders.objects.create(table=1, status='WA')
+        test_order.save()
+        test_order.product.add(test_product)
+
+    def test_url(self):  # Verifying if the correct url resolves
+        url = reverse('orders')
+        self.assertEqual(resolve(url).func.view_class, ControlOrders)
+
+    def test_OrdersGET(self):
+        response = self.client.get(reverse('orders'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(response, 'orders/orders.html')
+
+    def test_OrdersPOST(self):
+        response = self.client.post(reverse('orders'), {'submit': 1, 'status': 'PP'})
+        current_status = Orders.objects.get(pk=1).status
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(current_status, 'PP')
+
+    def test_OrdersDELETE(self):
+        order_to_delete = Orders.objects.all().first().pk
+        response = self.client.post(reverse('orders'), {'delete': order_to_delete, 'status': 'PP'})
+        orders = Orders.objects.all()
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(orders.count(), 1)
+
+
+class CheckoutTestCase(TestCase):
+    def setUp(self):
+        user = User.objects.create(username='test')
+        user.set_password('passtest')
+        user.save()
+        Payments.objects.create(value=0.0, user=user)
+        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
+        test_product = Products.objects.create(name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
+        test_product.save()
+        test_order = Orders.objects.create(table=1, status='WA')
+        test_order.save()
+        test_order.product.add(test_product)
+
+    def test_url(self):  # Verifying if the correct url resolves
+        url = reverse('checkout')
+        self.assertEqual(resolve(url).func.view_class, Checkout)
+
+    def test_CheckoutGET(self):
+        response = self.client.get(reverse('checkout'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(response, 'orders/checkout.html')
+
+    def test_CheckoutPOST(self):
+        response = self.client.post(reverse('checkout'), {'search': 1})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_CheckoutPOST_empty(self):
+        response = self.client.post(reverse('checkout'))
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+
+    def test_CheckoutPOST_SQL_injection(self):
+        response = self.client.post(reverse('checkout'), {'search': '\'); DELETE * FROM Order;'})
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        orders = Orders.objects.all()
+        self.assertNotEqual(orders.count(), 0)
+
+    def test_payOrders(self):
+        self.client.login(username='test', password='passtest')
+        response = self.client.post(reverse('pay_orders'), {'pay': 1})
+        self.status = Orders.objects.all().first().status
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(self.status, 'PA')
+
+
+class ProductsTestCase(TestCase):
+    def setUp(self):
+        sup = Suppliers.objects.create(id=1, name='testSupplier', address='test address', phone='01532334567', supply_type='test')
+        test_product = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=sup)
+        test_product.save()
+
+    def test_url(self):
+        url = reverse('products')
+        self.assertEqual(resolve(url).func.view_class, ListProducts)
+
+    def test_ProductsPOST_search(self):
+        response = self.client.post(reverse('products'), {'search': 1})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(response, 'orders/products.html')
+
+    def test_ProductsPOST_search_SQL_Injection(self):
+        response = self.client.post(reverse('products'), {'search': '1\'); DELETE * FROM Products;'})
+        products = Products.objects.all().count()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(products, 0)
+
+    def test_ProductsPOST_delete(self):
+        data = {"delete_btn": 1}
+        response = self.client.post(reverse('products'), data=data, format='json')
+        products = Products.objects.all().count()
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(products, 0)
+
 
 class LoginTestCase(TestCase):
 
