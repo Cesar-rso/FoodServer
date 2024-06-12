@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Orders, Products, Payments, Messages, Suppliers
-from .views import ControlOrders, login_request, Checkout, ListProducts, Product, Order, Message
+from .views import ControlOrders, login_request, Checkout, ListProducts, Product, Order, Message, Supplier
 import datetime
 
 
@@ -375,6 +375,35 @@ class MessagesAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         messages = Messages.objects.all()
         self.assertLess(messages.count(), messages_count)
+
+
+class SuppliersAPITest(APITestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username='test')
+        self.user.set_password('passtest')
+        self.user.save()
+
+        Suppliers.objects.create(name="test supplier", address="test address", phone=11223456, supply_type="test data")
+
+        Token.objects.create(user=self.user)
+
+    def test_url(self):
+        url = reverse('api-supplier')
+        self.assertEqual(resolve(url).func.view_class, Supplier)
+
+    def test_POSTnewSupplier(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-supplier')
+        data = {"name": "test supplier 2", "address": "test address 2", "phone": 12345678, "supply_type": "test data"}
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class OrdersTestCase(TestCase):
