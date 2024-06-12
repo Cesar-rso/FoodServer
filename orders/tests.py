@@ -404,6 +404,98 @@ class SuppliersAPITest(APITestCase):
         response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        sups = Suppliers.objects.all().count()
+        self.assertEqual(sups, 2)
+        sups = Suppliers.objects.get(id=2)
+        self.assertEqual(sups.name, "test supplier 2")
+
+    def test_POSTnewSupplierNoCredentials(self):
+        url = reverse('api-supplier')
+        data = {"name": "test supplier 2", "address": "test address 2", "phone": 12345678, "supply_type": "test data"}
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_GetAllSuppliersWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-supplier')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        sups = Suppliers.objects.all().count()
+        self.assertEqual(sups, 1)
+
+    def test_GetAllSuppliersNoCredentials(self):
+        url = reverse('api-supplier')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_GetSpecificSupplierWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-supplier')
+        data = {"id": 1}
+        response = self.client.get(url, data, format="json")
+
+        supp = Suppliers.objects.get(id=1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(supp.name, response.data["name"])
+
+    def test_GetSpecificSupplierWrongID(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-supplier')
+        data = {"id": 9}
+        response = self.client.get(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_UpdateSupplierNoCredentials(self):
+        url = reverse('api-supplier')
+        data = {"id": 1, "name": "test supplier 1", "address": "test address 1", "phone": 11223456, "supply_type": "test data"}
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_UpdateSupplierWrongID(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-supplier')
+        data = {"id": 9, "name": "test supplier 1", "address": "test address 1", "phone": 11223456, "supply_type": "test data"}
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_UpdateSupplierWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+        
+        url = reverse('api-supplier')
+        data = {"id": 1, "name": "test supplier 1", "address": "test address 1", "phone": 11223456, "supply_type": "test data"}
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class OrdersTestCase(TestCase):
