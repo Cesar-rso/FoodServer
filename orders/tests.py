@@ -497,6 +497,41 @@ class SuppliersAPITest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_DeleteNoCredentials(self):
+        url = reverse('api-supplier')
+        data = {"id": 1}
+
+        response = self.client.delete(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_DeleteWithCredentialsWrongID(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-supplier')
+        data = {"id": 9}
+
+        response = self.client.delete(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_DeleteWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-supplier')
+        data = {"id": 1}
+
+        response = self.client.delete(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        supps = Suppliers.objects.all().count()
+        self.assertEqual(supps, 0)
+
 
 class OrdersTestCase(TestCase):
     def setUp(self):
