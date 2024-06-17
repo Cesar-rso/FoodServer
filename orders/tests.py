@@ -467,7 +467,7 @@ class SuppliersAPITest(APITestCase):
     def test_UpdateSupplierNoCredentials(self):
         url = reverse('api-supplier')
         data = {"id": 1, "name": "test supplier 1", "address": "test address 1", "phone": 11223456, "supply_type": "test data"}
-        response = self.client.post(url, data, format="json")
+        response = self.client.put(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -480,7 +480,7 @@ class SuppliersAPITest(APITestCase):
 
         url = reverse('api-supplier')
         data = {"id": 9, "name": "test supplier 1", "address": "test address 1", "phone": 11223456, "supply_type": "test data"}
-        response = self.client.post(url, data, format="json")
+        response = self.client.put(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -493,9 +493,9 @@ class SuppliersAPITest(APITestCase):
         
         url = reverse('api-supplier')
         data = {"id": 1, "name": "test supplier 1", "address": "test address 1", "phone": 11223456, "supply_type": "test data"}
-        response = self.client.post(url, data, format="json")
+        response = self.client.put(url, data, format="json")
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_DeleteNoCredentials(self):
         url = reverse('api-supplier')

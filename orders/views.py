@@ -201,7 +201,7 @@ class Supplier(APIView):
     def get(self, request):
         data = request.GET 
 
-        if data['id']:
+        if 'id' in data.keys():
             try:
                 suppliers = Suppliers.objects.get(pk=data['id'])
             except:
@@ -232,8 +232,7 @@ class Supplier(APIView):
         return Response(resp, status)
     
     def put(self, request):
-        data = request.data
-        status = 200 
+        data = request.data 
 
         try:
             supplier = Suppliers.objects.get(pk=data['id'])
@@ -243,6 +242,7 @@ class Supplier(APIView):
             supplier.supply_type = data['supply_type']
             supplier.save()
 
+            status = 200
             resp = {"status": "Supplier successfully updated!"}
         except:
             status = 404
@@ -256,11 +256,13 @@ class Supplier(APIView):
         try:
             supplier = Suppliers.objects.get(pk=data['id'])
             supplier.delete()
+            status = 200
             resp = {"status": "Supplier deleted!"}
         except Exception as e:
+            status = 404
             resp = {"status": f"{e}"}
 
-        return Response(resp)
+        return Response(resp, status)
     
 
 class Message(APIView):
