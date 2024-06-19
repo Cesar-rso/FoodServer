@@ -16,13 +16,13 @@ class ProductAPITest(APITestCase):
         Products.objects.create(id=2, name='testProduct 2', description='-test-', price=4.16, cost=2.12, supplier=sup)
 
     def test_url(self):  # Verifying if the correct url resolves
-        url = reverse('check-product')
+        url = reverse('api-product')
         self.assertEqual(resolve(url).func.view_class, Product)
 
     def test_CheckCorrectID(self):
         product = Products.objects.all().first()
         search = {"id": product.pk}
-        url = reverse('check-product')
+        url = reverse('api-product')
 
         response = self.client.get(url, search)
         product_data = {"id": 1, "name": "testProduct", "description": "-test-", "price": 2.56, "cost": 1.80,
@@ -33,7 +33,7 @@ class ProductAPITest(APITestCase):
 
     def test_CheckWrongID(self):
         search = {"id": 5}
-        url = reverse('check-product')
+        url = reverse('api-product')
 
         response = self.client.get(url, search)
         product_data = {"exception": "Couldn't find requested product!"}
@@ -45,7 +45,7 @@ class ProductAPITest(APITestCase):
 
         product_data = {"name": "testProduct 3", "description": "-test-", "price": 3.15, "cost": 0.60,
                                          "picture": "/media/default.jpg", "supplier": 1}
-        url = reverse('check-product')
+        url = reverse('api-product')
         response = self.client.post(url, product_data, format="json")
         all_products = Products.objects.all()
 
@@ -55,7 +55,7 @@ class ProductAPITest(APITestCase):
     def test_UpdateProduct(self):
         product_data = {"id": 1,"name": "testProduct 1", "description": "-test-", "price": 3.52, "cost": 1.60,
                                          "picture": "/media/default.jpg", "supplier": 1}
-        url = reverse('check-product')
+        url = reverse('api-product')
         response = self.client.put(url, product_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -66,7 +66,7 @@ class ProductAPITest(APITestCase):
     def test_UpdateProductWrongID(self):
         product_data = {"id": 9,"name": "testProduct 1", "description": "-test-", "price": 8.52, "cost": 1.60,
                                          "picture": "/media/default.jpg", "supplier": 1}
-        url = reverse('check-product')
+        url = reverse('api-product')
         response = self.client.put(url, product_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -74,7 +74,7 @@ class ProductAPITest(APITestCase):
     def test_DeleteProductWrongID(self):
         product_data = {"id": 9}
 
-        url = reverse('check-product')
+        url = reverse('api-product')
         response = self.client.delete(url, product_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -82,7 +82,7 @@ class ProductAPITest(APITestCase):
     def test_DeleteProduct(self):
         product_data = {"id": 2}
 
-        url = reverse('check-product')
+        url = reverse('api-product')
         response = self.client.delete(url, product_data, format="json")
         all_products = Products.objects.all()
 

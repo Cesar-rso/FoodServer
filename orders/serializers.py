@@ -24,6 +24,14 @@ class SupplierSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class InputSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Inputs
+        fields = '__all__'
+
+
 class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:

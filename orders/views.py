@@ -32,7 +32,7 @@ class Order(APIView):
     def get(self, request):
         data = request.GET
 
-        if data['table']:
+        if 'table' in data.jeys():
             order = Orders.objects.filter(table=data['table']).order_by('date').first()
         else:
             order = Orders.objects.all()
@@ -124,7 +124,7 @@ class Product(APIView):
     def get(self, request):
 
         data = request.GET
-        if data['id']:
+        if 'id' in data.keys():
             try:
                 products = Products.objects.get(pk=int(data['id']))
             except:
@@ -263,6 +263,72 @@ class Supplier(APIView):
             resp = {"status": f"{e}"}
 
         return Response(resp, status)
+    
+
+class Input(APIView):
+    # REST API view to handle inputs (buys from suppliers)
+    permission_classes = (IsAuthenticated,)
+    parser_classes = (JSONParser,)
+
+    def get(self, request):
+        data = request.GET
+
+        if 'supplier' in data.keys():
+            inputs = Inputs.objects.get(supplier=data["supplier"])
+
+        elif 'id' in data.keys():
+            inputs = Inputs.objects.get(id=data["id"])
+
+        elif 'date' in data.keys():
+            inputs = Inputs.objects.get(id=data["date"])
+
+        else:
+            inputs = Inputs.objects.all()
+
+        if not inputs:
+            resp = {"exception": "Couldn't find requested order!"}
+            status = 404
+        
+        else:
+            status = 200
+            serializer = InputSerializer(inputs)
+            resp = serializer.data
+        
+        return Response(resp, status)
+
+    def post(self, request):
+        data = request.data 
+
+        try:
+            inputs = Inputs.objects.create(supplier=data["supplier"], discount=data["discount"], date=data["date"])
+            inputs.save()
+
+            products = data['products']
+        
+            for product in products:
+                try:
+                    p1 = Products.objects.get(pk=products[product])
+                    inputs.product.add(p1)
+                    
+                except Exception:
+                    resp = {"exception": "Error! Could not find product!"}
+                    status = 404
+                    return Response(resp, status)
+                
+            status = 200
+            resp = {"status": "New input successfully registered!"}
+
+        except:
+            resp = {"exception": "Error saving new input!"}
+            status = 500
+
+        return Response(resp, status)
+
+    def put(self, request):
+        pass
+
+    def delete(self, request):
+        pass
     
 
 class Message(APIView):
