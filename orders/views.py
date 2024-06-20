@@ -79,6 +79,8 @@ class Order(APIView):
         order.table = data['table']
         order.status = data['status']
         order.save()
+
+        order.product.clear()
         
         products = data['products']
         
@@ -325,10 +327,53 @@ class Input(APIView):
         return Response(resp, status)
 
     def put(self, request):
-        pass
+        data = request.data 
+
+        try:
+            inputs = Inputs.objects.get(id=data["id"])
+            inputs.date = data["date"]
+            inputs.discount = data["discount"]
+
+            supplier = Suppliers.objects.get(id=data["supplier"])
+            inputs.supplier = supplier
+            inputs.save()
+
+            inputs.products.clear()
+            products = data['products']
+        
+            for product in products:
+                try:
+                    p1 = Products.objects.get(pk=products[product])
+                    inputs.product.add(p1)
+                    
+                except Exception:
+                    status = 404
+                    resp = {"status": "Error! Could not find product!"}
+                    return Response(resp, status)
+                
+            inputs.save()
+
+        except:
+            resp = {"exception": "Could not find requested input!"}
+            status = 404
+
+        return Response(resp, status)
 
     def delete(self, request):
-        pass
+        data = request.data
+
+        try:
+            inputs = Inputs.objects.get(id=data["id"])
+            inputs.delete()
+
+            resp = {"status": "Input successfully deleted!"}
+            status = 200
+        
+        except:
+            resp = {"exception": "Could not find requested input!"}
+            status = 404
+
+        return Response(resp, status)
     
 
 class Message(APIView):
