@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Orders, Products, Payments, Messages, Suppliers
-from .views import ControlOrders, login_request, Checkout, ListProducts, Product, Order, Message, Supplier
+from .models import *
+from .views import *
 import datetime
 
 
@@ -533,7 +533,24 @@ class SuppliersAPITest(APITestCase):
         self.assertEqual(supps, 0)
 
 
+class InputsAPITest(APITestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username='test')
+        self.user.set_password('passtest')
+        self.user.save()
+
+        supp = Suppliers.objects.create(name="test supplier", address="test address", phone=11223456, supply_type="test data")
+        prod = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=supp)
+        inp = Inputs.objects.create(supplier=supp, date=datetime.datetime.now(), discount=10)
+        inp.products.add(prod)
+        inp.save()
+
+        Token.objects.create(user=self.user)
+
+
 class OrdersTestCase(TestCase):
+
     def setUp(self):
         user = User.objects.create(username='test')
         user.set_password('passtest')
