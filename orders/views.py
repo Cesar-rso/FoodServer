@@ -276,7 +276,8 @@ class Input(APIView):
         data = request.GET
 
         if 'supplier' in data.keys():
-            inputs = Inputs.objects.get(supplier=data["supplier"])
+            supp = Suppliers.objects.get(pk=data["supplier"])
+            inputs = Inputs.objects.get(supplier=supp)
 
         elif 'id' in data.keys():
             inputs = Inputs.objects.get(id=data["id"])
@@ -302,7 +303,8 @@ class Input(APIView):
         data = request.data 
 
         try:
-            inputs = Inputs.objects.create(supplier=data["supplier"], discount=data["discount"], date=data["date"])
+            supp = Suppliers.objects.get(pk=data["supplier"])
+            inputs = Inputs.objects.create(supplier=supp, discount=data["discount"], date=data["date"])
             inputs.save()
 
             products = data['products']

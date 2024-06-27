@@ -548,6 +548,56 @@ class InputsAPITest(APITestCase):
 
         Token.objects.create(user=self.user)
 
+    def test_url(self):
+        url = reverse('api-input')
+        self.assertEqual(resolve(url).func.view_class, Input)
+
+    def test_PostNewInputNoCredentials(self):
+        url = reverse('api-input')
+        data = {"supplier": 1, "discount": 5, "date": datetime.datetime.now(), "products": [1]}
+
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_PostNewInputWrongSupplier(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"supplier": 7, "discount": 5, "date": datetime.datetime.now(), "products": [1]}
+
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_PostNewInputWrongProduct(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"supplier": 1, "discount": 5, "date": datetime.datetime.now(), "products": [7]}
+
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_PostNewInput(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"supplier": 1, "discount": 5, "date": datetime.datetime.now(), "products": [1]}
+
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 class OrdersTestCase(TestCase):
 
