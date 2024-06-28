@@ -554,7 +554,7 @@ class InputsAPITest(APITestCase):
 
     def test_PostNewInputNoCredentials(self):
         url = reverse('api-input')
-        data = {"supplier": 1, "discount": 5, "date": datetime.datetime.now(), "products": [1]}
+        data = {"supplier": 1, "discount": 5, "date": str(datetime.datetime.now()), "products": [1]}
 
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -567,7 +567,7 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         url = reverse('api-input')
-        data = {"supplier": 7, "discount": 5, "date": datetime.datetime.now(), "products": [1]}
+        data = {"supplier": 7, "discount": 5, "date": str(datetime.datetime.now()), "products": [1]}
 
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -580,7 +580,7 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         url = reverse('api-input')
-        data = {"supplier": 1, "discount": 5, "date": datetime.datetime.now(), "products": [7]}
+        data = {"supplier": 1, "discount": 5, "date": str(datetime.datetime.now()), "products": [7]}
 
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -593,10 +593,17 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         url = reverse('api-input')
-        data = {"supplier": 1, "discount": 5, "date": datetime.datetime.now(), "products": [1]}
+        data = {"supplier": 1, "discount": 5, "date": str(datetime.datetime.now()), "products": [1]}
 
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_GetInputNoCredentials(self):
+        url = reverse('api-input')
+        data = {"id": 1}
+
+        response = self.client.get(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class OrdersTestCase(TestCase):
