@@ -605,6 +605,45 @@ class InputsAPITest(APITestCase):
         response = self.client.get(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_GetInputWithCredentialsWrongID(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"id": 11}
+
+        response = self.client.get(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_GetInputWithCredentialsWrongSupplier(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"supplier": 7}
+
+        response = self.client.get(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_GetAllInputs(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
 
 class OrdersTestCase(TestCase):
 
