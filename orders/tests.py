@@ -644,6 +644,39 @@ class InputsAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
+    def test_GetSpecificInputWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"id": 1}
+
+        response = self.client.get(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], 1)
+        self.assertEqual(response.data["discount"], 10)
+        self.assertEqual(response.data["supplier"], 1)
+
+    def test_GetInputsWithSpecificSupplierWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"supplier": 1}
+
+        response = self.client.get(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data["id"], 1)
+        self.assertEqual(response.data["discount"], 10)
+        self.assertEqual(response.data["supplier"], 1)
+
 
 class OrdersTestCase(TestCase):
 
