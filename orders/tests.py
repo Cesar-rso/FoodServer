@@ -539,10 +539,11 @@ class InputsAPITest(APITestCase):
         self.user = User.objects.create(username='test')
         self.user.set_password('passtest')
         self.user.save()
+        self.date = datetime.datetime.now()
 
         supp = Suppliers.objects.create(name="test supplier", address="test address", phone=11223456, supply_type="test data")
         prod = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=supp)
-        inp = Inputs.objects.create(supplier=supp, date=datetime.datetime.now(), discount=10)
+        inp = Inputs.objects.create(supplier=supp, date=self.date, discount=10)
         inp.products.add(prod)
         inp.save()
 
@@ -659,6 +660,7 @@ class InputsAPITest(APITestCase):
         self.assertEqual(response.data["id"], 1)
         self.assertEqual(response.data["discount"], 10)
         self.assertEqual(response.data["supplier"], 1)
+        self.assertEqual(response.data["date"], str(self.date))
 
     def test_GetInputsWithSpecificSupplierWithCredentials(self):
         check_login = self.client.login(username='test', password='passtest')
@@ -676,6 +678,60 @@ class InputsAPITest(APITestCase):
         self.assertEqual(response.data["id"], 1)
         self.assertEqual(response.data["discount"], 10)
         self.assertEqual(response.data["supplier"], 1)
+        self.assertEqual(response.data["date"], str(self.date))
+
+    def test_GetInputsWithSpecificDateWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"date": str(self.date)}
+
+        response = self.client.get(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data["id"], 1)
+        self.assertEqual(response.data["discount"], 10)
+        self.assertEqual(response.data["supplier"], 1)
+        self.assertEqual(response.data["date"], str(self.date))
+
+    def test_DeleteInputNoCredentials(self):
+        url = reverse('api-input')
+        data = {"id": 1}
+
+        response = self.client.delete(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_DeleteInputWithCredentialsWrongID(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"id": 9}
+
+        response = self.client.delete(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_DeleteInputWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"id": 1}
+
+        response = self.client.delete(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        inps = Inputs.objects.all()
+        self.assertEqual(len(inps), 0)
 
 
 class OrdersTestCase(TestCase):
