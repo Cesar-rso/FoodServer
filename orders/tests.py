@@ -698,6 +698,68 @@ class InputsAPITest(APITestCase):
         self.assertEqual(response.data["supplier"], 1)
         self.assertEqual(response.data["date"], str(self.date))
 
+    def test_UpdateNoCredentials(self):
+        url = reverse('api-input')
+        data = {"id": 1, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
+
+        response = self.client.put(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_UpdateWithCredentialsWrongID(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        url = reverse('api-input')
+        data = {"id": 7, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
+
+        response = self.client.put(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_UpdateWithCredentialsWrongSupplier(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+        
+        url = reverse('api-input')
+        data = {"id": 1, "supplier": 9, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
+
+        response = self.client.put(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_UpdateWithCredentialsWrongProduct(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+        
+        url = reverse('api-input')
+        data = {"id": 1, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [8]}
+
+        response = self.client.put(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_UpdateWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+        
+        url = reverse('api-input')
+        data = {"id": 1, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
+
+        response = self.client.put(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        inps = Inputs.objects.get(id=1)
+        self.assertEqual(inps.discount, 20)
+
     def test_DeleteInputNoCredentials(self):
         url = reverse('api-input')
         data = {"id": 1}
