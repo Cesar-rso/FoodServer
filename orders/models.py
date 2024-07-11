@@ -39,13 +39,13 @@ class Inputs(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # Implementear calculo de valor total com desconto
+        # Calculo de valor total com desconto
         sub_total = 0
-        for product in self.products:
+        for product in self.products.all():
             sub_total += product.cost
 
         self.total = sub_total - (sub_total * (self.discount / 100))
-        super.save(*args, **kwargs)
+        super(Inputs, self).save(*args, **kwargs)
 
 
 class Orders(models.Model):

@@ -32,7 +32,7 @@ class Order(APIView):
     def get(self, request):
         data = request.GET
 
-        if 'table' in data.jeys():
+        if 'table' in data.keys():
             order = Orders.objects.filter(table=data['table']).order_by('date').first()
         else:
             order = Orders.objects.all()
@@ -275,27 +275,27 @@ class Input(APIView):
     def get(self, request):
         data = request.GET
 
-        if 'supplier' in data.keys():
-            supp = Suppliers.objects.get(pk=data["supplier"])
-            inputs = Inputs.objects.get(supplier=supp)
+        try:
+            if 'supplier' in data.keys():
+                supp = Suppliers.objects.get(pk=data["supplier"])
+                inputs = Inputs.objects.get(supplier=supp)
 
-        elif 'id' in data.keys():
-            inputs = Inputs.objects.get(id=data["id"])
+            elif 'id' in data.keys():
+                inputs = Inputs.objects.get(id=data["id"])
 
-        elif 'date' in data.keys():
-            inputs = Inputs.objects.get(id=data["date"])
+            elif 'date' in data.keys():
+                inputs = Inputs.objects.get(date=data["date"])
 
-        else:
-            inputs = Inputs.objects.all()
+            else:
+                inputs = Inputs.objects.all()
 
-        if not inputs:
-            resp = {"exception": "Couldn't find requested order!"}
-            status = 404
-        
-        else:
             status = 200
             serializer = InputSerializer(inputs)
             resp = serializer.data
+
+        except:
+            resp = {"exception": "Couldn't find requested order!"}
+            status = 404
         
         return Response(resp, status)
 

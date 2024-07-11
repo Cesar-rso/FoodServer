@@ -541,9 +541,9 @@ class InputsAPITest(APITestCase):
         self.user.save()
         self.date = datetime.datetime.now()
 
-        supp = Suppliers.objects.create(name="test supplier", address="test address", phone=11223456, supply_type="test data")
+        supp = Suppliers.objects.create(id=1, name="test supplier", address="test address", phone=11223456, supply_type="test data")
         prod = Products.objects.create(id=1, name='testProduct', description='-test-', price=2.56, cost=1.80, supplier=supp)
-        inp = Inputs.objects.create(supplier=supp, date=self.date, discount=10)
+        inp = Inputs.objects.create(id=1, supplier=supp, date=self.date, discount=10)
         inp.products.add(prod)
         inp.save()
 
