@@ -586,7 +586,7 @@ class InputsAPITest(APITestCase):
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_PostNewInput(self):
+    def test_PostNewInputWithCredentials(self):
         check_login = self.client.login(username='test', password='passtest')
         self.assertTrue(check_login)
 
@@ -597,7 +597,8 @@ class InputsAPITest(APITestCase):
         data = {"supplier": 1, "discount": 5, "date": str(datetime.datetime.now()), "products": [1]}
 
         response = self.client.post(url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        print("\n", response.data, "\n")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_GetInputNoCredentials(self):
         url = reverse('api-input')
@@ -674,7 +675,6 @@ class InputsAPITest(APITestCase):
 
         response = self.client.get(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data["id"], 1)
         self.assertEqual(response.data["discount"], 10)
         self.assertEqual(response.data["supplier"], 1)
@@ -755,6 +755,7 @@ class InputsAPITest(APITestCase):
         data = {"id": 1, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
 
         response = self.client.put(url, data, format="json")
+        print("\n", response.data, "\n")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         inps = Inputs.objects.get(id=1)

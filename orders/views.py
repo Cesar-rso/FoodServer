@@ -303,7 +303,7 @@ class Input(APIView):
         data = request.data 
 
         try:
-            supp = Suppliers.objects.get(pk=data["supplier"])
+            supp = Suppliers.objects.get(id=data["supplier"])
             inputs = Inputs.objects.create(supplier=supp, discount=data["discount"], date=data["date"])
             inputs.save()
 
@@ -311,11 +311,11 @@ class Input(APIView):
         
             for product in products:
                 try:
-                    p1 = Products.objects.get(pk=products[product])
+                    p1 = Products.objects.get(id=products[product])
                     inputs.product.add(p1)
                     
                 except Exception:
-                    resp = {"exception": "Error! Could not find product!"}
+                    resp = {"exception": "Error in post! Could not find product!"}
                     status = 404
                     return Response(resp, status)
                 
@@ -323,8 +323,8 @@ class Input(APIView):
             resp = {"status": "New input successfully registered!"}
 
         except:
-            resp = {"exception": "Error saving new input!"}
-            status = 500
+            resp = {"exception": "Error in post! Could not find supplier!"}
+            status = 404
 
         return Response(resp, status)
 
@@ -345,12 +345,12 @@ class Input(APIView):
         
             for product in products:
                 try:
-                    p1 = Products.objects.get(pk=products[product])
+                    p1 = Products.objects.get(id=products[product])
                     inputs.product.add(p1)
                     
                 except Exception:
                     status = 404
-                    resp = {"status": "Error! Could not find product!"}
+                    resp = {"status": "Error in update! Could not find product!"}
                     return Response(resp, status)
                 
             inputs.save()
