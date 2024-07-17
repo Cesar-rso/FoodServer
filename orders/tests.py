@@ -594,7 +594,8 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         url = reverse('api-input')
-        data = {"supplier": 1, "discount": 5, "date": str(datetime.datetime.now()), "products": [1]}
+        date_str = str(datetime.datetime.now().year)+"-"+str(datetime.datetime.now().month)+"-"+str(datetime.datetime.now().day)
+        data = {"supplier": 1, "discount": 5, "date": date_str, "products": [1]}
 
         response = self.client.post(url, data, format="json")
         print("\n", response.data, "\n")
@@ -661,7 +662,7 @@ class InputsAPITest(APITestCase):
         self.assertEqual(response.data["id"], 1)
         self.assertEqual(response.data["discount"], 10)
         self.assertEqual(response.data["supplier"], 1)
-        self.assertEqual(response.data["date"], str(self.date))
+        self.assertEqual(response.data["date"][0:16], self.date.strftime("%Y-%m-%dT%H:%M"))
 
     def test_GetInputsWithSpecificSupplierWithCredentials(self):
         check_login = self.client.login(username='test', password='passtest')
@@ -678,7 +679,7 @@ class InputsAPITest(APITestCase):
         self.assertEqual(response.data["id"], 1)
         self.assertEqual(response.data["discount"], 10)
         self.assertEqual(response.data["supplier"], 1)
-        self.assertEqual(response.data["date"], str(self.date))
+        self.assertEqual(response.data["date"][0:16], self.date.strftime("%Y-%m-%dT%H:%M"))
 
     def test_GetInputsWithSpecificDateWithCredentials(self):
         check_login = self.client.login(username='test', password='passtest')
@@ -688,7 +689,7 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         url = reverse('api-input')
-        data = {"date": str(self.date)}
+        data = {"date": self.date.strftime("%Y-%m-%dT%H:%M")}
 
         response = self.client.get(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -696,11 +697,11 @@ class InputsAPITest(APITestCase):
         self.assertEqual(response.data["id"], 1)
         self.assertEqual(response.data["discount"], 10)
         self.assertEqual(response.data["supplier"], 1)
-        self.assertEqual(response.data["date"], str(self.date))
+        self.assertEqual(response.data["date"][0:16], self.date.strftime("%Y-%m-%dT%H:%M"))
 
     def test_UpdateNoCredentials(self):
         url = reverse('api-input')
-        data = {"id": 1, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
+        data = {"id": 1, "supplier": 1, "discount": 20, "date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M"), "products": [1]}
 
         response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -713,7 +714,7 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         url = reverse('api-input')
-        data = {"id": 7, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
+        data = {"id": 7, "supplier": 1, "discount": 20, "date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M"), "products": [1]}
 
         response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -726,7 +727,7 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
         
         url = reverse('api-input')
-        data = {"id": 1, "supplier": 9, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
+        data = {"id": 1, "supplier": 9, "discount": 20, "date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M"), "products": [1]}
 
         response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -739,7 +740,7 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
         
         url = reverse('api-input')
-        data = {"id": 1, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [8]}
+        data = {"id": 1, "supplier": 1, "discount": 20, "date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M"), "products": [8]}
 
         response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -752,7 +753,7 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
         
         url = reverse('api-input')
-        data = {"id": 1, "supplier": 1, "discount": 20, "date": str(datetime.datetime.now()), "products": [1]}
+        data = {"id": 1, "supplier": 1, "discount": 20, "date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M"), "products": [1]}
 
         response = self.client.put(url, data, format="json")
         print("\n", response.data, "\n")
