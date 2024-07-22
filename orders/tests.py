@@ -693,7 +693,6 @@ class InputsAPITest(APITestCase):
 
         response = self.client.get(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data["id"], 1)
         self.assertEqual(response.data["discount"], 10)
         self.assertEqual(response.data["supplier"], 1)

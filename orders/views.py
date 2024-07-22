@@ -284,7 +284,7 @@ class Input(APIView):
                 inputs = Inputs.objects.get(id=data["id"])
 
             elif 'date' in data.keys():
-                inputs = Inputs.objects.get(date=data["date"])
+                inputs = Inputs.objects.get(date__date=datetime.datetime.strptime(data["date"], "%Y-%m-%dT%H:%M"))
 
             else:
                 inputs = Inputs.objects.all()
