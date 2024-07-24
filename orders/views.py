@@ -304,15 +304,15 @@ class Input(APIView):
 
         try:
             supp = Suppliers.objects.get(id=data["supplier"])
-            inputs = Inputs.objects.create(supplier=supp, discount=data["discount"], date=data["date"])
+            inputs = Inputs.objects.create(id=2, supplier=supp, discount=data["discount"], date=datetime.datetime.strptime(data["date"], "%Y-%m-%dT%H:%M"))
             inputs.save()
 
             products = data['products']
         
             for product in products:
                 try:
-                    p1 = Products.objects.get(id=products[product])
-                    inputs.product.add(p1)
+                    p1 = Products.objects.get(id=product)
+                    inputs.products.add(p1)
                     
                 except Exception:
                     resp = {"exception": "Error in post! Could not find product!"}
@@ -333,7 +333,7 @@ class Input(APIView):
 
         try:
             inputs = Inputs.objects.get(id=data["id"])
-            inputs.date = data["date"]
+            inputs.date = datetime.datetime.strptime(data["date"], "%Y-%m-%dT%H:%M")
             inputs.discount = data["discount"]
 
             supplier = Suppliers.objects.get(id=data["supplier"])
@@ -345,8 +345,8 @@ class Input(APIView):
         
             for product in products:
                 try:
-                    p1 = Products.objects.get(id=products[product])
-                    inputs.product.add(p1)
+                    p1 = Products.objects.get(id=product)
+                    inputs.products.add(p1)
                     
                 except Exception:
                     status = 404
@@ -354,6 +354,9 @@ class Input(APIView):
                     return Response(resp, status)
                 
             inputs.save()
+
+            resp = {"status": "Update confirmed!"}
+            status = 200
 
         except:
             resp = {"exception": "Could not find requested input!"}

@@ -568,7 +568,9 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         url = reverse('api-input')
-        data = {"supplier": 7, "discount": 5, "date": str(datetime.datetime.now()), "products": [1]}
+        date_str = str(datetime.datetime.now().year)+"-"+str(datetime.datetime.now().month)+"-"+str(datetime.datetime.now().day)
+        date_str += "T"+str(datetime.datetime.now().hour)+":"+str(datetime.datetime.now().minute)
+        data = {"supplier": 7, "discount": 5, "date": date_str, "products": [1]}
 
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -581,7 +583,9 @@ class InputsAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         url = reverse('api-input')
-        data = {"supplier": 1, "discount": 5, "date": str(datetime.datetime.now()), "products": [7]}
+        date_str = str(datetime.datetime.now().year)+"-"+str(datetime.datetime.now().month)+"-"+str(datetime.datetime.now().day)
+        date_str += "T"+str(datetime.datetime.now().hour)+":"+str(datetime.datetime.now().minute)
+        data = {"supplier": 1, "discount": 5, "date": date_str, "products": [7]}
 
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -595,10 +599,10 @@ class InputsAPITest(APITestCase):
 
         url = reverse('api-input')
         date_str = str(datetime.datetime.now().year)+"-"+str(datetime.datetime.now().month)+"-"+str(datetime.datetime.now().day)
+        date_str += "T"+str(datetime.datetime.now().hour)+":"+str(datetime.datetime.now().minute)
         data = {"supplier": 1, "discount": 5, "date": date_str, "products": [1]}
 
         response = self.client.post(url, data, format="json")
-        print("\n", response.data, "\n")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_GetInputNoCredentials(self):
@@ -755,7 +759,6 @@ class InputsAPITest(APITestCase):
         data = {"id": 1, "supplier": 1, "discount": 20, "date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M"), "products": [1]}
 
         response = self.client.put(url, data, format="json")
-        print("\n", response.data, "\n")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         inps = Inputs.objects.get(id=1)
