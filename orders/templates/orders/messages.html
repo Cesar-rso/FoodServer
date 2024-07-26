@@ -1,0 +1,41 @@
+{% extends 'orders/base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Messages" %}{% endblock %}
+{% block body %}
+    <nav class="navbar navbar-default" style="background-color:Tomato">
+        <div class="container-fluid">
+            <h1>{% translate "Messages" %}</h1>
+            <div class="navbar navbar-left">
+                <a href="{% url 'write_message' %}"><h2 style="color:black"><pre> {% translate "Write Message" %} </pre></h2></a>
+            </div>
+            <form class="navbar-form navbar-right" role="search" method="post" name="search">
+                 {% csrf_token %}
+                <div class="form-group">
+                    <label for="msg_search"><h2>{% translate "Search" %}: </h2></label>
+                    <input type="text" id="msg_search" class="form-control" name="search" value="">
+                </div>
+                <button type="submit" class="btn btn-default">OK</button>
+            </form>
+        </div>
+    </nav>
+<ul style="list-style-type:none;">
+{% for message in messages %}
+    <li>
+        <div style="background-image:linear-gradient(to bottom right, pink, green); border: thick double; width:50%;height:auto;">
+
+            <h2> {{ message.sender }} || {{ message.subject }}</h2><br>
+            <h2> {{ message.date }}</h2><br>
+           
+            <br>
+            
+                <form method="post">
+                        {% csrf_token %}
+                    <button name="delete_btn" type="submit" value="{{ message.id }}" style="position:relative; top:-130px; right:-650px;">{% translate "Delete Message" %}</button>
+                </form>
+            
+        </div>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

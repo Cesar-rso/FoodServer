@@ -67,6 +67,12 @@
         {% endif %}
         <div class="navbar navbar-left">
             <div class="dropdown">
+                <br>
+                <a href="{% url 'messages' %}" class="dropbtn">{% translate "Messages" %}</a>
+            </div> 
+        </div>
+        <div class="navbar navbar-left">
+            <div class="dropdown">
                 <button class="dropbtn">{% translate "System" %}</button>
                 <div class="dropdown-content">
                     <a href="{% url "info" %}"><h2> {% translate "Company Info" %} </h2></a>
