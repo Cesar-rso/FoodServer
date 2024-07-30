@@ -579,6 +579,25 @@ class ListUsers(generic.ListView):
         usr.delete()
 
         return redirect('users')
+    
+
+class ListMessages(generic.ListView):
+    # View that lists all messages a logged in user received
+    template_name = "orders/messages.html"
+    context_object_name = "messages"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        context = read_config()
+        return Messages.objects.all().order_by("date")
+    
+    def post(self, request):
+        pass
+
+    def delete(self, request):
+        msg = Messages.objects.get(pk=request.POST['delete_btn'])
+        msg.delete()
+
+        return redirect("messages")
 
 
 class ProductRegistration(CreateView):
