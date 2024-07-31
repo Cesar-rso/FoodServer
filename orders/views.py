@@ -591,13 +591,26 @@ class ListMessages(generic.ListView):
         return Messages.objects.all().order_by("date")
     
     def post(self, request):
-        pass
+        if 'search' in request.POST.keys() and request.POST['search'] != '':
+            msg_search = request.POST['search']
+            try:
+                msg_date = datetime.datetime.strptime(msg_search, "%Y-%m-%d")
+                msgs = Messages.objects.filter(date=msg_date)
+            except ValueError:
+                usr = User.objects.filter(name=msg_search).first()
+                msgs = Messages.objects.filter(sender=usr)
 
-    def delete(self, request):
-        msg = Messages.objects.get(pk=request.POST['delete_btn'])
-        msg.delete()
+            context = {"messages": msgs}
 
-        return redirect("messages")
+            return render(request, 'orders/messages.html', context)
+        if 'delete_btn' in request.POST.keys() and request.POST['delete_btn'] != '':
+            try:
+                msg = Messages.objects.get(pk=request.POST['delete_btn'])
+                msg.delete()
+
+                return redirect("messages")
+            except:
+                return render(request=request, template_name="orders/error.html", context={"message": "Could not find id to delete!"}, status=404)
 
 
 class ProductRegistration(CreateView):
