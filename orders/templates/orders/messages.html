@@ -7,7 +7,7 @@
         <div class="container-fluid">
             <h1>{% translate "Messages" %}</h1>
             <div class="navbar navbar-left">
-                <a href="{% url 'write_message' %}"><h2 style="color:black"><pre> {% translate "Write Message" %} </pre></h2></a>
+                <a href="{% url 'new_message' %}"><h2 style="color:black"><pre> {% translate "Write Message" %} </pre></h2></a>
             </div>
             <form class="navbar-form navbar-right" role="search" method="post" name="search">
                  {% csrf_token %}

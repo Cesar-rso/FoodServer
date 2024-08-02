@@ -7,6 +7,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.views import generic
 from django.views.generic import CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -625,6 +626,17 @@ class SupplierRegistration(CreateView):
     model = Suppliers
     fields = '__all__'
     template_name = "orders/supplier-form.html"
+
+
+class MessageCreation(LoginRequiredMixin, CreateView):
+    # Basic form view for creating new messages
+    model = Messages
+    fields = ['receiver', 'date', 'message']
+    template_name = "orders/message-form.html"
+
+    def form_valid(self, form):
+        form.instance.sender = self.request.user
+        return super(MessageCreation, self).form_valid(form)
 
 
 class SupplierUpdate(UpdateView):
