@@ -13,7 +13,13 @@
                  {% csrf_token %}
                 <div class="form-group">
                     <label for="msg_search"><h2>{% translate "Search" %}: </h2></label>
-                    <input type="text" id="msg_search" class="form-control" name="search" value="">
+                    <input type="text" id="msg_search" class="form-control" name="search" value=""><br>
+                    <label for="date">Date  </label>
+                    <input type="radio" id="date" name="search_type" value="date">
+                    <label for="sender">Sender  </label>
+                    <input type="radio" id="sender" name="search_type" value="sender">
+                    <label for="receiver">Receiver  </label>
+                    <input type="radio" id="receiver" name="search_type" value="receiver">
                 </div>
                 <button type="submit" class="btn btn-default">OK</button>
             </form>
