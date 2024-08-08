@@ -594,22 +594,31 @@ class ListMessages(generic.ListView):
     def post(self, request):
         if 'search' in request.POST.keys() and request.POST['search'] != '':
             msg_search = request.POST['search']
+            search_type = request.POST['search_type']
             try:
-                msg_date = datetime.datetime.strptime(msg_search, "%Y-%m-%d")
-                msgs = Messages.objects.filter(date=msg_date)
-            except ValueError:
-                usr = User.objects.filter(name=msg_search).first()
-                msgs = Messages.objects.filter(sender=usr)
+                if search_type == "date":
+                    msg_date = datetime.datetime.strptime(msg_search, "%Y-%m-%d")
+                    msgs = Messages.objects.filter(date=msg_date)
+                else:
+                    usr = User.objects.filter(name=msg_search).first()
+                    if search_type == "sender":
+                        msgs = Messages.objects.filter(sender=usr)
+                    if search_type == "receiver":
+                        msgs = Messages.objects.filter(receiver=usr)
+            except:
+                return render(request=request, template_name="orders/error.html", context={"message": "Could not find messages!"}, status=404)
 
             context = {"messages": msgs}
 
             return render(request, 'orders/messages.html', context)
+        
         if 'delete_btn' in request.POST.keys() and request.POST['delete_btn'] != '':
             try:
                 msg = Messages.objects.get(pk=request.POST['delete_btn'])
                 msg.delete()
 
                 return redirect("messages")
+            
             except:
                 return render(request=request, template_name="orders/error.html", context={"message": "Could not find id to delete!"}, status=404)
 
