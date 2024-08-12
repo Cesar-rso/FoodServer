@@ -103,4 +103,5 @@ class Messages(models.Model):
         related_name='user_receiver',
     )
     date = models.DateTimeField(default=datetime.datetime.now)
+    subject = models.CharField(max_length=200, default="")
     message = models.CharField(max_length=800)
