@@ -600,11 +600,15 @@ class ListMessages(generic.ListView):
                     msg_date = datetime.datetime.strptime(msg_search, "%Y-%m-%d")
                     msgs = Messages.objects.filter(date=msg_date)
                 else:
-                    usr = User.objects.filter(name=msg_search).first()
-                    if search_type == "sender":
-                        msgs = Messages.objects.filter(sender=usr)
-                    if search_type == "receiver":
-                        msgs = Messages.objects.filter(receiver=usr)
+                    if search_type == "subject":
+                        msgs = Messages.objects.filter(subject__contains=msg_search)
+
+                    else:
+                        usr = User.objects.filter(name=msg_search).first()
+                        if search_type == "sender":
+                            msgs = Messages.objects.filter(sender=usr)
+                        if search_type == "receiver":
+                            msgs = Messages.objects.filter(receiver=usr)
             except Exception as e:
                 return render(request=request, template_name="orders/error.html", context={"message": "Could not find messages! " + str(e)}, status=404)
 
