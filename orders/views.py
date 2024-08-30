@@ -423,7 +423,7 @@ class Message(APIView):
             resp = {"status": "Couldn't find user for sender and/or receiver!"}
             status = 404
             return Response(resp, status=status)
-        message = Messages(sender=sender, receiver=receiver, date=data["date"], message=data["message"])
+        message = Messages(sender=sender, receiver=receiver, date=data["date"], message=data["message"], subject=data["subject"])
         message.save()
 
         resp = {"status": "Message sent!"}

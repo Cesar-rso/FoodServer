@@ -1,5 +1,6 @@
  # FoodServer
  **English** A basic back-end system for restaurants, where orders can be made through an REST API in local network.
+
  **Português** Um sistema de back-end básico para restaurantes, onde pedidos podem ser feitos por API REST na rede local.
  
  ## API structure
@@ -9,12 +10,15 @@
  GET
  
  ***parameters:***
+
  "table": integer - (optional)
  
  ***body:*** 
+
  {}
  
  ***It returns the following:***
+
 {"order": integer,
  "products": {"product1": integer, "product2": integer, ...},
  "table": integer,
@@ -29,11 +33,13 @@ POST
 
 
 ***body:***
+
 {"products": {"product1": integer, "product2": integer, ...},
  "table": integer,
  "status": string} 
  
  ***It returns the following:***
+
  {"status": "Order placed!"}
 
   ___________________________________________________________
@@ -44,12 +50,14 @@ PUT
 
 
 ***body:***
+
 {"id": integer,
  "products": {"product1": integer, "product2": integer, ...},
  "table": integer,
  "status": string} 
  
  ***It returns the following:***
+
  {"status": "Order updated!"}
  
  ___________________________________________________________
@@ -60,9 +68,11 @@ DELETE
  
  
  ***body:*** 
+
  {"table": integer}
  
  ***It returns the following:***
+
  {"status": "Order canceled!"}
  
  
@@ -71,12 +81,14 @@ DELETE
 GET
 
 ***parameters:***
+
  "id": integer - (optional)
 
 ***body:*** 
 {} 
  
 ***It returns the following:***
+
 {"name": string,
  "description": string,
  "price": float}
@@ -89,6 +101,7 @@ POST
  
  
  ***body:*** 
+
  {"name": string, 
   "description": string, 
    "price": float, 
@@ -97,6 +110,7 @@ POST
    "supplier": integer}
  
  ***It returns the following:***
+
  {"status": "New product successfully registered!"}
  
  ___________________________________________________________
@@ -107,6 +121,7 @@ PUT
  
  
  ***body:*** 
+
  {"id": integer, 
   "name": string, 
   "description": string, 
@@ -116,6 +131,7 @@ PUT
   "supplier": integer}
  
  ***It returns the following:***
+
  {"status": "Product successfully updated!"}
 
  ___________________________________________________________
@@ -126,9 +142,11 @@ DELETE
  
  
  ***body:*** 
+
  {"id": integer}
  
  ***It returns the following:***
+
  {"status": "Product successfully deleted!"}
 
 
@@ -137,12 +155,14 @@ DELETE
  GET
 
  ***parameters:***
+
  "id": integer - (optional)
 
 ***body:*** 
 {} 
  
 ***It returns the following:***
+
 {"name": string,
  "address": string,
  "phone": integer,
@@ -156,12 +176,14 @@ POST
  
  
  ***body:*** 
+
  {"name": string,
  "address": string,
  "phone": integer,
  "supply_type": string}
 
  ***It returns the following:***
+
  {"status": "New supplier successfully registered!"}
 
  ___________________________________________________________
@@ -172,6 +194,7 @@ PUT
  
  
  ***body:*** 
+
  {"id": integer,
   "name": string,
  "address": string,
@@ -179,6 +202,7 @@ PUT
  "supply_type": string}
 
  ***It returns the following:***
+
  {"status": "Supplier successfully updated!"}
  ___________________________________________________________
  ***method:***
@@ -188,10 +212,61 @@ DELETE
  
  
  ***body:*** 
+
  {"id": integer}
  
  ***It returns the following:***
+
  {"status": "Supplier deleted!"}
+
+
+ ### URL 'api/messages'
+ ***method:***
+GET
+
+ ***parameters:***
+
+ "message_id": integer (optional)
+ "sender": integer (optional)
+ 
+ ***body:*** 
+ 
+ ***It returns the following in case of error:***
+
+ {"status": "Error retriving messages!"}
+  ___________________________________________________________
+   ***method:***
+POST
+
+ ***parameters:***
+ 
+ 
+ ***body:*** 
+
+ {"sender": integer,
+  "receiver": integer,
+  "date": date,
+  "subject": string,
+  "message": string}
+ 
+ ***It returns the following:***
+
+ {"status": "Message sent!"}
+  ___________________________________________________________
+   ***method:***
+DELETE
+
+ ***parameters:***
+ 
+ 
+ ***body:*** 
+
+ {"message_id": integer}
+ 
+ ***It returns the following:***
+
+ {"status": "Message deleted!"}
+  ___________________________________________________________
 
  
  ### URL 'api/auth_token'
@@ -202,8 +277,10 @@ DELETE
  
  
  ***body:*** 
+
 {"username": string, 
 "password": string} 
 
 ***It returns the following:***
+
 { 'token' : string }
