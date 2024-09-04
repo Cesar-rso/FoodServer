@@ -11,18 +11,26 @@
  
  ***parameters:***
 
- "table": integer - (optional)
+ | field | type | requirement |
+ |-------|------|-------------|
+ | table | integer | optional |
+
+If no parameter is passed, the API returns all entries
  
  ***body:*** 
 
- {}
+ -Empty-
  
- ***It returns the following:***
+ ***It returns the following JSON:***
 
-{"order": integer,
+```
+{
+  "order": integer,
  "products": {"product1": integer, "product2": integer, ...},
  "table": integer,
- "status": string}
+ "status": string
+ }
+```
  
 
  ___________________________________________________________
@@ -31,16 +39,34 @@ POST
 
 ***parameters:***
 
+-Empty-
 
 ***body:***
 
-{"products": {"product1": integer, "product2": integer, ...},
- "table": integer,
- "status": string} 
- 
- ***It returns the following:***
+| field | type | requirement |
+ |-------|------|-------------|
+ | table | integer | mandatory |
+ | products* | dict | mandatory |
+ | status | string | mandatory |
 
- {"status": "Order placed!"}
+*Each key in the products dictionary must be named "product" + an number enumerating the product
+
+Example:
+```
+{
+ "products": {"product1": 5, "product2": 11},
+ "table": 2,
+ "status": "WA"
+} 
+ ```
+ 
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "Order placed!"
+ }
+ ```
 
   ___________________________________________________________
 ***method:***
@@ -48,17 +74,34 @@ PUT
 
 ***parameters:***
 
+-Empty
 
 ***body:***
 
-{"id": integer,
- "products": {"product1": integer, "product2": integer, ...},
- "table": integer,
- "status": string} 
- 
- ***It returns the following:***
+| field | type | requirement |
+ |-------|------|-------------|
+ | id | integer | mandatory |
+ | table | integer | mandatory |
+ | products* | dict | mandatory |
+ | status | string | mandatory |
 
- {"status": "Order updated!"}
+*Each key in the products dictionary must be named "product" + an number enumerating the product
+
+Example:
+
+```
+{"id": 2,
+ "products": {"product1": 4, "product2": 13},
+ "table": 6,
+ "status": "PP"}
+ ``` 
+ 
+ ***It returns the following JSON:***
+```
+ {
+  "status": "Order updated!"
+ }
+```
  
  ___________________________________________________________
  ***method:***
@@ -66,14 +109,28 @@ DELETE
 
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
- {"table": integer}
- 
- ***It returns the following:***
+ | field | type | requirement |
+ |-------|------|-------------|
+ | table | integer | mandatory |
 
- {"status": "Order canceled!"}
+ Example:
+ ```
+{
+  "table: 4
+}
+ ```
+ 
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "Order canceled!"
+ }
+ ```
  
  
 ### URL 'api/product'
@@ -82,16 +139,25 @@ GET
 
 ***parameters:***
 
- "id": integer - (optional)
+| field | type | requirement |
+ |-------|------|-------------|
+ | id | integer | optional |
+
+ If no parameter is passed, the API returns all entries
 
 ***body:*** 
-{} 
- 
-***It returns the following:***
 
-{"name": string,
+-Empty- 
+ 
+***It returns the following JSON:***
+
+```
+{
+ "name": string,
  "description": string,
- "price": float}
+ "price": float
+}
+ ```
 
  ___________________________________________________________
  ***method:***
@@ -99,19 +165,39 @@ POST
 
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
- {"name": string, 
-  "description": string, 
-   "price": float, 
-   "cost": float, 
-   "picture": string, 
-   "supplier": integer}
- 
- ***It returns the following:***
+| field | type | requirement |
+ |-------|------|-------------|
+| name | string | mandatory |
+| description | string | mandatory |
+| price | float | mandatory |
+| cost | float | mandatory |
+| picture* | string | mandatory |
+| supplier | integer| mandatory |
 
- {"status": "New product successfully registered!"}
+*The picture field is the location configured for static files in Django settings
+
+Example:
+
+```
+ {"name": "Soda", 
+  "description": "Soda 350ml bottle", 
+   "price": 3.56, 
+   "cost": 2.41, 
+   "picture": "/product/Soda1.jpg", 
+   "supplier": 1}
+ ```
+
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "New product successfully registered!"
+ }
+ ```
  
  ___________________________________________________________
  ***method:***
@@ -119,20 +205,41 @@ PUT
 
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
- {"id": integer, 
-  "name": string, 
-  "description": string, 
-  "price": float, 
-  "cost": float, 
-  "picture": string, 
-  "supplier": integer}
- 
- ***It returns the following:***
+| field | type | requirement |
+ |-------|------|-------------|
+| id | integer | mandatory |
+| name | string | mandatory |
+| description | string | mandatory |
+| price | float | mandatory |
+| cost | float | mandatory |
+| picture* | string | mandatory |
+| supplier | integer| mandatory |
 
- {"status": "Product successfully updated!"}
+Example:
+
+```
+ {
+  "id": 3, 
+  "name": "Beef Wellington", 
+  "description": "Wagyu beef, dough, mushrooms", 
+  "price": 34.65, 
+  "cost": 20.12, 
+  "picture": "/products/BfWellington.jpg", 
+  "supplier": 5
+ }
+ ```
+ 
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "Product successfully updated!"
+ }
+ ```
 
  ___________________________________________________________
  ***method:***
@@ -140,14 +247,21 @@ DELETE
 
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
- {"id": integer}
+| field | type | requirement |
+ |-------|------|-------------|
+| id | integer | mandatory |
  
- ***It returns the following:***
+ ***It returns the following JSON:***
 
- {"status": "Product successfully deleted!"}
+```
+ {
+  "status": "Product successfully deleted!"
+ }
+ ```
 
 
  ### URL 'api/supplier'
@@ -156,17 +270,26 @@ DELETE
 
  ***parameters:***
 
- "id": integer - (optional)
+| field | type | requirement |
+ |-------|------|-------------|
+| id | integer | optional |
+
+If no parameter is passed, the API returns all entries
 
 ***body:*** 
-{} 
- 
-***It returns the following:***
 
-{"name": string,
+-Empty-
+ 
+***It returns the following JSON:***
+
+```
+{
+  "name": string,
  "address": string,
  "phone": integer,
- "supply_type": string}
+ "supply_type": string
+}
+ ```
 
  ___________________________________________________________
  ***method:***
@@ -174,17 +297,35 @@ POST
 
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
- {"name": string,
- "address": string,
- "phone": integer,
- "supply_type": string}
+| field | type | requirement |
+ |-------|------|-------------|
+ | name | string | mandatory |
+ | address | string | mandatory |
+ | phone | integer | mandatory |
+ | supply_type | string | mandatory |
 
- ***It returns the following:***
+ Example:
 
- {"status": "New supplier successfully registered!"}
+```
+ {
+  "name": " Happy Daisy",
+ "address": "548 Farm Street, City-ST",
+ "phone": 518798989,
+ "supply_type": "Dairy products"
+ }
+ ```
+
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "New supplier successfully registered!"
+ }
+ ```
 
  ___________________________________________________________
  ***method:***
@@ -192,32 +333,64 @@ PUT
 
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
- {"id": integer,
-  "name": string,
- "address": string,
- "phone": integer,
- "supply_type": string}
+| field | type | requirement |
+ |-------|------|-------------|
+ | id | integer | mandatory |
+ | name | string | mandatory |
+ | address | string | mandatory |
+ | phone | integer | mandatory |
+ | supply_type | string | mandatory |
 
- ***It returns the following:***
+ Example:
 
- {"status": "Supplier successfully updated!"}
+```
+ {
+  "id": 4,
+  "name": " Happy Daisy Inc.",
+ "address": "538 Farm Street, City-ST",
+ "phone": 518798989,
+ "supply_type": "Dairy products"
+ }
+ ```
+
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "Supplier successfully updated!"
+ }
+ ```
  ___________________________________________________________
  ***method:***
 DELETE
 
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
- {"id": integer}
- 
- ***It returns the following:***
+| field | type | requirement |
+ |-------|------|-------------|
+ | id | integer | mandatory |
+  
+  Example:
 
- {"status": "Supplier deleted!"}
+```
+ {"id": 4}
+ ```
+ 
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "Supplier deleted!"
+ }
+ ```
 
 
  ### URL 'api/messages'
@@ -226,46 +399,89 @@ GET
 
  ***parameters:***
 
- "message_id": integer (optional)
- "sender": integer (optional)
+| field | type | requirement |
+ |-------|------|-------------|
+ | message_id | integer | optional |
+ | sender | integer | optional |
+
+ If no parameter is passed, the API returns all entries
  
  ***body:*** 
- 
- ***It returns the following in case of error:***
 
- {"status": "Error retriving messages!"}
+ -Empty-
+ 
+ ***It returns the following JSON in case of error:***
+
+```
+ {
+  "status": "Error retriving messages!"
+ }
+ ```
   ___________________________________________________________
    ***method:***
 POST
 
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
- {"sender": integer,
-  "receiver": integer,
-  "date": date,
-  "subject": string,
-  "message": string}
- 
- ***It returns the following:***
+| field | type | requirement |
+ |-------|------|-------------|
+ | receiver | integer | mandatory |
+ | sender | integer | mandatory |
+ | date | date | mandatory |
+ | subject | string | mandatory |
+ | message | string | mandatory |
 
- {"status": "Message sent!"}
+Example:
+
+```
+ {
+  "sender": 2,
+  "receiver": 5,
+  "date": "2024-05-12",
+  "subject": "Supplier Bill",
+  "message": "Just a reminder to pay the supplier 2 before 12AM"
+ }
+```
+ 
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "Message sent!"
+ }
+ ```
   ___________________________________________________________
    ***method:***
 DELETE
 
  ***parameters:***
  
+ -Empty
  
  ***body:*** 
 
- {"message_id": integer}
- 
- ***It returns the following:***
+| field | type | requirement |
+ |-------|------|-------------|
+ | message_id | integer | mandatory |
 
- {"status": "Message deleted!"}
+Example:
+```
+ {
+  "message_id": 3
+ }
+ ```
+ 
+ ***It returns the following JSON:***
+
+```
+ {
+  "status": "Message deleted!"
+ }
+ ```
   ___________________________________________________________
 
  
@@ -275,12 +491,27 @@ DELETE
  
  ***parameters:***
  
+ -Empty-
  
  ***body:*** 
 
-{"username": string, 
-"password": string} 
+| field | type | requirement |
+ |-------|------|-------------|
+ | username | string | mandatory |
+ | password | string | mandatory |
 
-***It returns the following:***
+Example:
+```
+{
+  "username": "Johnny3", 
+  "password": "Ef44@"
+} 
+```
 
-{ 'token' : string }
+***It returns the following JSON:***
+
+```
+{
+  "token": string 
+}
+```
