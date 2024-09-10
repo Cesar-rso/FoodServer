@@ -104,7 +104,11 @@ class Order(APIView):
         data = request.data
 
         try:
-            order = Orders.objects.filter(table=data['table']).order_by('date').first()
+            if "table" in data.keys():
+                order = Orders.objects.filter(table=data['table']).order_by('date').first()
+            elif "order" in data.keys():
+                order = Orders.objects.get(id=data["order"])
+                
             if order is None:
                 resp = {"exception": "Couldn't find requested order!"}
                 status = 404
