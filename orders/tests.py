@@ -119,7 +119,7 @@ class OrderAPITest(APITestCase):
         response = self.client.delete(reverse('api-orders'), data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_CancelWithCredentials(self):
+    def test_CancelLastFromTableWithCredentials(self):
         check_login = self.client.login(username='test', password='passtest')
         self.assertTrue(check_login)
 
@@ -127,6 +127,21 @@ class OrderAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
 
         data = {"table": 1}
+
+        response = self.client.delete(reverse('api-orders'), data=data, format="json")
+        order = Orders.objects.filter(table=1).order_by('date')[0]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(order.status, Orders.Status.CANCELED)
+
+    def test_CancelSpecificOrderWithCredentials(self):
+        check_login = self.client.login(username='test', password='passtest')
+        self.assertTrue(check_login)
+
+        token = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token[0].key}')
+
+        data = {"order": 1}
 
         response = self.client.delete(reverse('api-orders'), data=data, format="json")
         order = Orders.objects.filter(table=1).order_by('date')[0]
